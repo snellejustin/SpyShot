@@ -13,8 +13,15 @@ export interface UserProfile {
 }
 
 class AuthService {
-  // Register new user
-  async register(email: string, password: string, username: string, name: string): Promise<UserProfile> {
+  // Register new user — only creates the auth account.
+  // Profile is created on first login via ensureProfile().
+  // Returns { user, needsEmailConfirmation }.
+  async register(
+    email: string,
+    password: string,
+    username: string,
+    name: string
+  ): Promise<{ user: any; needsEmailConfirmation: boolean }> {
     try {
       // Check if username is already taken
       const { data: existingUser } = await supabase
@@ -27,39 +34,74 @@ class AuthService {
         throw new Error('Username is already taken');
       }
 
-      // Create auth user
+      // Create auth user with profile data stored in metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: { username, name },
+        },
       });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error('Failed to create user');
 
-      // Create user profile in database
-      const userProfile: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'> = {
-        email: authData.user.email!,
-        username,
-        name,
-        bio: '',
-        profile_picture: null,
-      };
+      // If the session exists, email confirmation is off — create profile now
+      const needsEmailConfirmation = !authData.session;
 
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ ...userProfile, id: authData.user.id }])
-        .select()
-        .single();
+      if (authData.session) {
+        await this.ensureProfile(authData.user);
+      }
 
-      if (profileError) throw profileError;
-      
-      return profileData as UserProfile;
+      return { user: authData.user, needsEmailConfirmation };
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
 
-  // Sign in user
+  // Ensure a profile row exists for the authenticated user.
+  // Reads username/name from auth user metadata if creating for the first time.
+  async ensureProfile(user: { id: string; email?: string; user_metadata?: any }): Promise<UserProfile> {
+    try {
+      // Check if profile already exists
+      const { data: existing, error: getError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (existing && !getError) {
+        return existing as UserProfile;
+      }
+
+      // Create profile from auth metadata
+      const meta = user.user_metadata || {};
+      const email = user.email || '';
+      const username = meta.username || email.split('@')[0];
+      const name = meta.name || username;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert([{
+          id: user.id,
+          email,
+          username,
+          name,
+          bio: '',
+          profile_picture: null,
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as UserProfile;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  // Sign in user — also creates the profile if this is the first login
+  // (e.g. after confirming email).
   async login(email: string, password: string): Promise<UserProfile> {
     try {
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -70,7 +112,8 @@ class AuthService {
       if (authError) throw authError;
       if (!authData.user) throw new Error('Login failed - no user returned');
 
-      const userProfile = await this.getUserProfile(authData.user.id);
+      // ensureProfile creates the profile on first login if it doesn't exist yet
+      const userProfile = await this.ensureProfile(authData.user);
       return userProfile;
     } catch (error: any) {
       throw new Error(error.message);

@@ -63,8 +63,17 @@ export default function RegisterScreen() {
     if (!validate()) return;
 
     try {
-      await register(email.trim(), password, username.trim(), name.trim());
-      router.replace('/onboarding');
+      const needsEmailConfirmation = await register(email.trim(), password, username.trim(), name.trim());
+
+      if (needsEmailConfirmation) {
+        Alert.alert(
+          'Check Your Email',
+          'We sent a confirmation link to your email. Please confirm to activate your account, then come back and log in.',
+          [{ text: 'OK', onPress: () => router.replace('/login') }]
+        );
+      } else {
+        router.replace('/onboarding');
+      }
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message);
     }

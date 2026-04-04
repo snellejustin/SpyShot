@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, username: string, name: string) => Promise<void>;
+  register: (email: string, password: string, username: string, name: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Omit<UserProfile, 'id' | 'created_at'>>) => Promise<void>;
   uploadProfilePicture: (imageUri: string) => Promise<string>;
@@ -41,11 +41,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (session?.user) {
           setUser(session.user);
           try {
-            const profile = await authService.getUserProfile(session.user.id);
+            // ensureProfile creates the row on first session restore if needed
+            const profile = await authService.ensureProfile(session.user);
             setUserProfile(profile);
             refreshNotificationCount(session.user.id);
           } catch {
-            // Profile may not exist yet — that's fine
+            // Profile creation may fail if not fully authenticated yet
           }
         }
       } catch {
@@ -107,18 +108,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const register = async (email: string, password: string, username: string, name: string) => {
+  const register = async (email: string, password: string, username: string, name: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const profile = await authService.register(email, password, username, name);
-      const currentUser = await authService.getCurrentUser();
+      const { user: authUser, needsEmailConfirmation } = await authService.register(email, password, username, name);
 
-      setUser(currentUser);
-      setUserProfile(profile);
-
-      if (currentUser) {
-        refreshNotificationCount(currentUser.id);
+      if (!needsEmailConfirmation) {
+        // Auto-confirmed: set up session immediately
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          const profile = await authService.ensureProfile(currentUser);
+          setUserProfile(profile);
+          refreshNotificationCount(currentUser.id);
+        }
       }
+
+      return needsEmailConfirmation;
     } catch (error) {
       throw error;
     } finally {
