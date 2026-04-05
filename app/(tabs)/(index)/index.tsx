@@ -7,7 +7,6 @@ import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     Animated,
     FlatList,
     Image,
@@ -316,41 +315,19 @@ export default function HomeScreen() {
         }
     };
 
-    const handleCreateGroup = (type: string) => {
-        if (activeGameSession) {
-            Alert.alert('Active Game', 'Finish your current game before creating a new group.');
-            return;
-        }
-        router.push(`/create-group?type=${type}`);
-    };
-
     return (
         <ThemedView style={[LAYOUT.screen, { paddingTop: insets.top + SPACING.md }]}>
             {/* Header */}
             <View style={styles.header}>
                 <ThemedText style={styles.headerTitle}>SpyShot</ThemedText>
-                <View style={styles.headerRight}>
-                    <TouchableOpacity
-                        style={styles.createButton}
-                        onPress={() => {
-                            Alert.alert('New Group', 'Where are you meeting?', [
-                                { text: 'Cafe', onPress: () => handleCreateGroup('cafe') },
-                                { text: 'Home', onPress: () => handleCreateGroup('home') },
-                                { text: 'Cancel', style: 'cancel' },
-                            ]);
-                        }}
-                    >
-                        <Ionicons name="add-circle" size={26} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.notifButton} onPress={() => router.push('/notifications')}>
-                        <Ionicons name="notifications" size={22} color={COLORS.text} />
-                        {notificationCount > 0 && (
-                            <View style={styles.notifBadge}>
-                                <Text style={styles.notifBadgeText}>{notificationCount}</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity style={styles.notifButton} onPress={() => router.push('/notifications')}>
+                    <Ionicons name="notifications" size={22} color={COLORS.text} />
+                    {notificationCount > 0 && (
+                        <View style={styles.notifBadge}>
+                            <Text style={styles.notifBadgeText}>{notificationCount}</Text>
+                        </View>
+                    )}
+                </TouchableOpacity>
             </View>
 
             {/* Tab switcher */}
@@ -456,14 +433,6 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: COLORS.primary,
         letterSpacing: 0.5,
-    },
-    headerRight: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: SPACING.md,
-    },
-    createButton: {
-        padding: SPACING.xs,
     },
     notifButton: {
         position: 'relative',
