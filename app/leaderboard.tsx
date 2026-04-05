@@ -71,7 +71,7 @@ export default function LeaderboardScreen() {
 
   const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => {
     const isTop3 = index < 3;
-    const rankColor = index === 0 ? COLORS.primary : index === 1 ? COLORS.textMuted : '#CD7F32';
+    const rankColor = index === 0 ? COLORS.primary : index === 1 ? COLORS.textMuted : COLORS.bronze;
 
     return (
       <TouchableOpacity

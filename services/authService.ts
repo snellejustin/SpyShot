@@ -1148,6 +1148,18 @@ class AuthService {
             await this.addPhotoToBadge(newBadge.id, roundData.photo_url, roundData.timer_seconds, roundId);
           }
         }
+
+        // Create feed item for the badge
+        await this.createFeedItem({
+          userId: roundData.selected_player_id,
+          type: 'badge_earned',
+          title: `Earned the ${roundData.task.badge_name} badge`,
+          subtitle: roundData.task.badge_description,
+          photoUrl: roundData.photo_url || undefined,
+          badgeName: roundData.task.badge_name,
+          groupId: roundData.session.group_id,
+          roundId,
+        });
       }
     } catch (error: any) {
       console.error('Failed to award badge:', error);
@@ -1565,6 +1577,128 @@ class AuthService {
       return leaderboard.sort((a, b) => b.totalCompletions - a.totalCompletions);
     } catch (error: any) {
       throw new Error(`Failed to load leaderboard: ${error.message}`);
+    }
+  }
+  // ============================================================
+  // FEED METHODS
+  // ============================================================
+
+  // Get feed items for the user's friends
+  async getFriendsFeed(userId: string, limit = 30, offset = 0): Promise<any[]> {
+    try {
+      const friends = await this.getFriends(userId);
+      const friendIds = [userId, ...friends.map((f: any) => f.id)];
+
+      const { data, error } = await supabase
+        .from('feed_items')
+        .select(`
+          *,
+          user:profiles!feed_items_user_id_fkey(id, username, name, profile_picture),
+          group:groups(name),
+          reactions(id, emoji, user_id)
+        `)
+        .in('user_id', friendIds)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error: any) {
+      console.error('Failed to load friends feed:', error);
+      return [];
+    }
+  }
+
+  // Get explore feed (all users, excluding friends)
+  async getExploreFeed(userId: string, limit = 30, offset = 0): Promise<any[]> {
+    try {
+      const friends = await this.getFriends(userId);
+      const excludeIds = [userId, ...friends.map((f: any) => f.id)];
+
+      const { data, error } = await supabase
+        .from('feed_items')
+        .select(`
+          *,
+          user:profiles!feed_items_user_id_fkey(id, username, name, profile_picture),
+          group:groups(name),
+          reactions(id, emoji, user_id)
+        `)
+        .not('user_id', 'in', `(${excludeIds.join(',')})`)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error: any) {
+      console.error('Failed to load explore feed:', error);
+      return [];
+    }
+  }
+
+  // Add a reaction to a feed item
+  async addReaction(feedItemId: string, userId: string, emoji: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('reactions')
+        .upsert({
+          feed_item_id: feedItemId,
+          user_id: userId,
+          emoji,
+        }, { onConflict: 'feed_item_id,user_id' });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Failed to add reaction:', error);
+      throw new Error(error.message);
+    }
+  }
+
+  // Remove a reaction from a feed item
+  async removeReaction(feedItemId: string, userId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('reactions')
+        .delete()
+        .eq('feed_item_id', feedItemId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Failed to remove reaction:', error);
+      throw new Error(error.message);
+    }
+  }
+
+  // Create a feed item (called after completing a task or earning a badge)
+  async createFeedItem(data: {
+    userId: string;
+    type: string;
+    title: string;
+    subtitle?: string;
+    photoUrl?: string;
+    badgeName?: string;
+    tierName?: string;
+    groupId?: string;
+    roundId?: string;
+  }): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('feed_items')
+        .insert([{
+          user_id: data.userId,
+          type: data.type,
+          title: data.title,
+          subtitle: data.subtitle,
+          photo_url: data.photoUrl,
+          badge_name: data.badgeName,
+          tier_name: data.tierName,
+          group_id: data.groupId,
+          round_id: data.roundId,
+        }]);
+
+      if (error) throw error;
+    } catch {
+      // Feed item creation is non-critical — don't throw
     }
   }
 }

@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: COLORS.overlay40,
         paddingBottom: SPACING.xl,
         paddingTop: SPACING.lg,
     },
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: SPACING.lg,
         gap: SPACING.md,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: COLORS.overlay80,
     },
     retakeButton: {
         flex: 1,

@@ -48,7 +48,7 @@ interface EarnedBadge {
   };
 }
 
-const RANK_COLORS = [COLORS.primary, COLORS.textMuted, '#CD7F32']; // gold, silver, bronze
+const RANK_COLORS = [COLORS.primary, COLORS.textMuted, COLORS.bronze]; // gold, silver, bronze
 const RANK_EMOJIS = ['🥇', '🥈', '🥉'];
 
 export default function GameSummaryScreen() {

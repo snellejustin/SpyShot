@@ -27,7 +27,7 @@ CREATE POLICY "profiles_select" ON profiles
     FOR SELECT USING (true);
 
 CREATE POLICY "profiles_insert" ON profiles
-    FOR INSERT WITH CHECK (auth.uid() = id);
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 CREATE POLICY "profiles_update" ON profiles
     FOR UPDATE USING (auth.uid() = id);

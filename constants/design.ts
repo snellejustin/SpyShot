@@ -39,6 +39,15 @@ export const COLORS = {
   gray800: '#1f2937',
   gray900: '#111827',
   
+  // Medal/rank colors
+  gold: '#FFD700',
+  bronze: '#CD7F32',
+
+  // Overlays
+  overlay80: 'rgba(0, 0, 0, 0.8)',
+  overlay60: 'rgba(0, 0, 0, 0.6)',
+  overlay40: 'rgba(0, 0, 0, 0.4)',
+
   // Semantic colors - Dark theme
   background: '#1f2937', // Dark grey background
   surface: '#374151', // Slightly lighter grey for cards/surfaces
