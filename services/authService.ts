@@ -798,11 +798,14 @@ class AuthService {
   // GAME SYSTEM METHODS
 
   // Start a new game session
-  async startGameSession(groupId: string, creatorId: string, durationMinutes: number, intervalMinutes: number): Promise<any> {
+  async startGameSession(groupId: string, creatorId: string, durationMinutes: number, intervalMinutes: number, intensity: string = 'wild'): Promise<any> {
     try {
       const now = new Date();
-      // Set first task to start immediately
       const nextTaskAt = new Date(now.getTime());
+
+      // Generate a room code
+      const { data: codeResult } = await supabase.rpc('generate_room_code');
+      const roomCode = codeResult || Math.random().toString(36).substring(2, 6).toUpperCase();
 
       const { data, error } = await supabase
         .from('game_sessions')
@@ -811,11 +814,13 @@ class AuthService {
           creator_id: creatorId,
           duration_minutes: durationMinutes,
           interval_minutes: intervalMinutes,
+          intensity,
+          room_code: roomCode,
           status: 'active',
           started_at: now.toISOString(),
           last_task_at: now.toISOString(),
           next_task_at: nextTaskAt.toISOString(),
-          current_round: 0 // Start at 0 so first task becomes round 1
+          current_round: 0
         }])
         .select()
         .single();
@@ -914,9 +919,27 @@ class AuthService {
         throw new Error('No group members found');
       }
 
-      // Get all available tasks
-      const tasks = await this.getGameTasks();
-      if (tasks.length === 0) {
+      // Get session intensity to filter tasks
+      const { data: sessionInfo } = await supabase
+        .from('game_sessions')
+        .select('intensity')
+        .eq('id', sessionId)
+        .single();
+      const intensity = sessionInfo?.intensity || 'wild';
+
+      // Get tasks matching the session's intensity (chill includes chill only,
+      // wild includes chill + wild, extreme includes all)
+      const intensityFilter = intensity === 'chill' ? ['chill']
+        : intensity === 'wild' ? ['chill', 'wild']
+        : ['chill', 'wild', 'extreme'];
+
+      const { data: tasks, error: tasksError } = await supabase
+        .from('game_tasks')
+        .select('*')
+        .in('intensity', intensityFilter);
+
+      if (tasksError) throw tasksError;
+      if (!tasks || tasks.length === 0) {
         throw new Error('No game tasks available');
       }
 
@@ -1579,6 +1602,126 @@ class AuthService {
       throw new Error(`Failed to load leaderboard: ${error.message}`);
     }
   }
+  // Join a game session by room code
+  async joinByRoomCode(roomCode: string, userId: string): Promise<any> {
+    try {
+      // Find active session with this code
+      const { data: session, error } = await supabase
+        .from('game_sessions')
+        .select('*, group:groups(id, name)')
+        .eq('room_code', roomCode.toUpperCase())
+        .eq('status', 'active')
+        .single();
+
+      if (error || !session) throw new Error('No active game found with that code');
+
+      // Add user to the group if not already a member
+      const { data: existingMember } = await supabase
+        .from('group_members')
+        .select('id')
+        .eq('group_id', session.group_id)
+        .eq('user_id', userId)
+        .single();
+
+      if (!existingMember) {
+        await supabase
+          .from('group_members')
+          .insert([{
+            group_id: session.group_id,
+            user_id: userId,
+            status: 'accepted',
+            joined_at: new Date().toISOString(),
+          }]);
+      }
+
+      return session;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  // ============================================================
+  // ACHIEVEMENT METHODS
+  // ============================================================
+
+  async getPlayerAchievements(playerId: string): Promise<any[]> {
+    try {
+      const { data: allAchievements } = await supabase
+        .from('achievements')
+        .select('*')
+        .order('category', { ascending: true });
+
+      const { data: playerProgress } = await supabase
+        .from('player_achievements')
+        .select('*')
+        .eq('player_id', playerId);
+
+      const progressMap = new Map((playerProgress || []).map((p: any) => [p.achievement_key, p]));
+
+      return (allAchievements || []).map((a: any) => ({
+        ...a,
+        progress: progressMap.get(a.key)?.progress || 0,
+        unlocked: progressMap.get(a.key)?.unlocked || false,
+        unlocked_at: progressMap.get(a.key)?.unlocked_at,
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  async updateAchievementProgress(userId: string, key: string, increment: number = 1): Promise<void> {
+    try {
+      const { data: achievement } = await supabase
+        .from('achievements')
+        .select('threshold')
+        .eq('key', key)
+        .single();
+
+      if (!achievement) return;
+
+      const { data: existing } = await supabase
+        .from('player_achievements')
+        .select('*')
+        .eq('player_id', userId)
+        .eq('achievement_key', key)
+        .single();
+
+      if (existing?.unlocked) return; // Already unlocked
+
+      const newProgress = (existing?.progress || 0) + increment;
+      const unlocked = newProgress >= achievement.threshold;
+
+      await supabase
+        .from('player_achievements')
+        .upsert({
+          player_id: userId,
+          achievement_key: key,
+          progress: newProgress,
+          unlocked,
+          unlocked_at: unlocked ? new Date().toISOString() : null,
+        }, { onConflict: 'player_id,achievement_key' });
+
+      // Create feed item when achievement is unlocked
+      if (unlocked && !existing?.unlocked) {
+        const { data: achInfo } = await supabase
+          .from('achievements')
+          .select('title, description')
+          .eq('key', key)
+          .single();
+        if (achInfo) {
+          await this.createFeedItem({
+            userId,
+            type: 'level_up',
+            title: `Unlocked: ${achInfo.title}`,
+            subtitle: achInfo.description,
+          });
+        }
+      }
+    } catch {
+      // Non-critical
+    }
+  }
+
   // ============================================================
   // FEED METHODS
   // ============================================================

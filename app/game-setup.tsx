@@ -20,8 +20,9 @@ export default function GameSetupScreen() {
     const { user } = useAuth();
     const { groupId } = useLocalSearchParams<{ groupId: string }>();
     
-    const [selectedDuration, setSelectedDuration] = useState<number>(60); // Default 1 hour
-    const [selectedInterval, setSelectedInterval] = useState<number>(5); // Default 5 minutes
+    const [selectedDuration, setSelectedDuration] = useState<number>(60);
+    const [selectedInterval, setSelectedInterval] = useState<number>(5);
+    const [selectedIntensity, setSelectedIntensity] = useState<'chill' | 'wild' | 'extreme'>('wild');
     const [starting, setStarting] = useState(false);
 
     // Check for active games when screen loads
@@ -76,6 +77,12 @@ export default function GameSetupScreen() {
         { label: '30 minutes', value: 30 }
     ];
 
+    const intensityOptions: { label: string; value: 'chill' | 'wild' | 'extreme'; icon: string; color: string; desc: string }[] = [
+        { label: 'Chill', value: 'chill', icon: 'happy-outline', color: COLORS.partyBlue, desc: 'Icebreakers & light fun' },
+        { label: 'Wild', value: 'wild', icon: 'flame-outline', color: COLORS.partyOrange, desc: 'Classic party mode' },
+        { label: 'Extreme', value: 'extreme', icon: 'skull-outline', color: COLORS.partyPink, desc: 'Late night chaos' },
+    ];
+
     const handleStartGame = async () => {
         if (!user || !groupId) return;
 
@@ -99,7 +106,8 @@ export default function GameSetupScreen() {
                 groupId,
                 user.id,
                 selectedDuration,
-                selectedInterval
+                selectedInterval,
+                selectedIntensity
             );
 
             Alert.alert(
@@ -185,6 +193,32 @@ export default function GameSetupScreen() {
                                 ]}>
                                     {option.label}
                                 </ThemedText>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+
+                {/* Intensity */}
+                <View style={styles.section}>
+                    <ThemedText style={styles.sectionTitle}>Intensity</ThemedText>
+                    <View style={styles.intensityContainer}>
+                        {intensityOptions.map((option) => (
+                            <TouchableOpacity
+                                key={option.value}
+                                style={[
+                                    styles.intensityOption,
+                                    selectedIntensity === option.value && { borderColor: option.color, backgroundColor: option.color + '15' }
+                                ]}
+                                onPress={() => setSelectedIntensity(option.value)}
+                            >
+                                <Ionicons name={option.icon as any} size={24} color={selectedIntensity === option.value ? option.color : COLORS.textMuted} />
+                                <ThemedText style={[
+                                    styles.intensityLabel,
+                                    selectedIntensity === option.value && { color: option.color }
+                                ]}>
+                                    {option.label}
+                                </ThemedText>
+                                <ThemedText style={styles.intensityDesc}>{option.desc}</ThemedText>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -356,5 +390,29 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: COLORS.white,
+    },
+    intensityContainer: {
+        flexDirection: 'row',
+        gap: SPACING.sm,
+    },
+    intensityOption: {
+        flex: 1,
+        alignItems: 'center',
+        padding: SPACING.md,
+        borderRadius: BORDER_RADIUS.md,
+        borderWidth: 2,
+        borderColor: COLORS.border,
+        backgroundColor: COLORS.surface,
+        gap: SPACING.xs,
+    },
+    intensityLabel: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: COLORS.text,
+    },
+    intensityDesc: {
+        fontSize: 10,
+        color: COLORS.textMuted,
+        textAlign: 'center',
     },
 });

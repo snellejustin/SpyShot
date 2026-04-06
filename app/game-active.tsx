@@ -91,6 +91,7 @@ export default function GameActiveScreen() {
     const [chosenPlayer, setChosenPlayer] = useState<GroupMember | null>(null);
     const [isStartingShuffle, setIsStartingShuffle] = useState(false);
     const [justCompletedTask, setJustCompletedTask] = useState(false);
+    const [choseBold, setChoseBold] = useState(false);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
     const [gameTimeRemaining, setGameTimeRemaining] = useState<string>('');
@@ -191,6 +192,7 @@ export default function GameActiveScreen() {
                 setTimeout(() => {
                     setShowShuffle(false);
                     setCurrentRound(newRound);
+                    setChoseBold(false);
                     setChosenPlayer(null);
                     setShuffleAnimations([]);
                     setIsStartingShuffle(false);
@@ -512,16 +514,27 @@ export default function GameActiveScreen() {
                             </ThemedText>
                         </View>
                     </View>
-                    {gameSession && user && gameSession.creator_id !== user.id && (
-                        <View style={styles.statusRight}>
+                    <View style={styles.statusRight}>
+                        {gameSession?.room_code && (
+                            <TouchableOpacity
+                                style={styles.roomCodeBadge}
+                                onPress={() => {
+                                    Alert.alert('Room Code', `Share this code with friends to join:\n\n${gameSession.room_code}`, [{ text: 'OK' }]);
+                                }}
+                            >
+                                <Ionicons name="key" size={12} color={COLORS.primary} />
+                                <ThemedText style={styles.roomCodeText}>{gameSession.room_code}</ThemedText>
+                            </TouchableOpacity>
+                        )}
+                        {gameSession && user && gameSession.creator_id !== user.id && (
                             <View style={styles.creatorCard}>
                                 <Ionicons name="person" size={14} color={COLORS.textSecondary} />
                                 <ThemedText style={styles.creatorInfo}>
                                     @{gameSession.group?.creator?.username || 'Creator'}
                                 </ThemedText>
                             </View>
-                        </View>
-                    )}
+                        )}
+                    </View>
                 </View>
             </View>
 
@@ -644,20 +657,41 @@ export default function GameActiveScreen() {
 
                         {isCurrentPlayer && (
                             <View style={styles.taskCard}>
+                                {/* Bold/Easy toggle */}
+                                {currentRound.task.bold_description && (
+                                    <View style={styles.boldToggle}>
+                                        <TouchableOpacity
+                                            style={[styles.boldToggleOption, !choseBold && styles.boldToggleActive]}
+                                            onPress={() => setChoseBold(false)}
+                                        >
+                                            <ThemedText style={[styles.boldToggleText, !choseBold && styles.boldToggleTextActive]}>Easy</ThemedText>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[styles.boldToggleOption, styles.boldToggleBold, choseBold && styles.boldToggleBoldActive]}
+                                            onPress={() => setChoseBold(true)}
+                                        >
+                                            <Ionicons name="flame" size={14} color={choseBold ? COLORS.white : COLORS.partyOrange} />
+                                            <ThemedText style={[styles.boldToggleText, styles.boldToggleTextBold, choseBold && styles.boldToggleTextBoldActive]}>Bold (2x)</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+
                                 <ThemedText style={styles.taskTitle}>
                                     {currentRound.task.title}
                                 </ThemedText>
                                 <ThemedText style={styles.taskDescription}>
-                                    {currentRound.task.description}
+                                    {choseBold && currentRound.task.bold_description
+                                        ? currentRound.task.bold_description
+                                        : currentRound.task.description}
                                 </ThemedText>
-                                
+
                                 {currentRound.task.requires_photo && (
                                     <View style={styles.taskRequirement}>
                                         <Ionicons name="camera" size={16} color={COLORS.partyOrange} />
                                         <ThemedText style={styles.requirementText}>Photo required</ThemedText>
                                     </View>
                                 )}
-                                
+
                                 {currentRound.task.requires_timer && (
                                     <View style={styles.taskRequirement}>
                                         <Ionicons name="timer" size={16} color={COLORS.partyOrange} />
@@ -1189,6 +1223,62 @@ const styles = StyleSheet.create({
     leaderboardCloseButtonText: {
         fontSize: 16,
         fontWeight: '600',
+        color: COLORS.white,
+    },
+    roomCodeBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.primary + '20',
+        paddingHorizontal: SPACING.sm,
+        paddingVertical: 4,
+        borderRadius: BORDER_RADIUS.sm,
+        gap: 4,
+        borderWidth: 1,
+        borderColor: COLORS.primary + '40',
+    },
+    roomCodeText: {
+        fontSize: 12,
+        fontWeight: '800',
+        color: COLORS.primary,
+        letterSpacing: 1,
+    },
+    boldToggle: {
+        flexDirection: 'row',
+        marginBottom: SPACING.md,
+        borderRadius: BORDER_RADIUS.md,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: COLORS.border,
+    },
+    boldToggleOption: {
+        flex: 1,
+        paddingVertical: SPACING.sm,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: COLORS.surface,
+    },
+    boldToggleActive: {
+        backgroundColor: COLORS.partyGreen,
+    },
+    boldToggleBold: {
+        flexDirection: 'row',
+        gap: 4,
+    },
+    boldToggleBoldActive: {
+        backgroundColor: COLORS.partyOrange,
+    },
+    boldToggleText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.textMuted,
+    },
+    boldToggleTextActive: {
+        color: COLORS.white,
+    },
+    boldToggleTextBold: {
+        color: COLORS.partyOrange,
+    },
+    boldToggleTextBoldActive: {
         color: COLORS.white,
     },
 });

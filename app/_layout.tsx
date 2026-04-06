@@ -31,6 +31,7 @@ function RootLayoutNav() {
         <Stack.Screen name="badges-list" />
         <Stack.Screen name="user-profile" />
         <Stack.Screen name="leaderboard" />
+        <Stack.Screen name="join-game" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

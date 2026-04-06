@@ -22,9 +22,10 @@ export default function TabLayout() {
     const colorScheme = useColorScheme();
 
     const handleNewEvent = () => {
-        Alert.alert('New Event', 'Where are you meeting?', [
-            { text: 'Cafe', onPress: () => router.push('/create-group?type=cafe') },
-            { text: 'Home', onPress: () => router.push('/create-group?type=home') },
+        Alert.alert('What do you want to do?', undefined, [
+            { text: 'Create Cafe Group', onPress: () => router.push('/create-group?type=cafe') },
+            { text: 'Create Home Group', onPress: () => router.push('/create-group?type=home') },
+            { text: 'Join with Code', onPress: () => router.push('/join-game') },
             { text: 'Cancel', style: 'cancel' },
         ]);
     };
