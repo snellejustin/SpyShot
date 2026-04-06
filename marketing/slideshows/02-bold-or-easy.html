@@ -16,24 +16,24 @@
     text-align: center; color: #f9fafb; flex-shrink: 0;
   }
   .bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
-  .overlay { position: absolute; inset: 0; }
-  .content {
+  .ov { position: absolute; inset: 0; }
+  .ct {
     position: relative; z-index: 2; display: flex; flex-direction: column;
     align-items: center; justify-content: center; width: 100%; height: 100%; padding: 80px;
   }
 
-  /* SLIDE 1: HOOK — Group cheersing */
-  .s1 .bg { background-image: url('https://images.unsplash.com/photo-1575444758702-4a6b9222336e?w=1080&q=80'); }
-  .s1 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%); }
+  /* S1: HOOK — Friends cheersing outdoors with beers */
+  .s1 .bg { background-image: url('https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=1200&q=80'); }
+  .s1 .ov { background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.75) 100%); }
   .s1 .emoji { font-size: 100px; margin-bottom: 40px; }
   .s1 h1 { font-size: 70px; font-weight: 900; line-height: 1.1; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
   .s1 h1 .orange { color: #f97316; }
-  .s1 p { font-size: 30px; color: rgba(255,255,255,0.6); margin-top: 40px; }
+  .s1 p { font-size: 30px; color: rgba(255,255,255,0.55); margin-top: 40px; }
 
-  /* SLIDE 2: EASY — Chill selfie scene */
-  .s2 .bg { background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1080&q=80'); }
-  .s2 .overlay { background: linear-gradient(180deg, rgba(15,41,32,0.92) 0%, rgba(31,41,55,0.95) 100%); }
-  .s2 .content { align-items: stretch; }
+  /* S2: EASY — Relaxed outdoor hangout */
+  .s2 .bg { background-image: url('https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=1200&q=80'); }
+  .s2 .ov { background: linear-gradient(180deg, rgba(15,41,32,0.93) 0%, rgba(31,41,55,0.96) 100%); }
+  .s2 .ct { align-items: stretch; }
   .s2 .label {
     font-size: 28px; font-weight: 700; color: #10b981;
     text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; text-align: center;
@@ -45,23 +45,21 @@
   .s2 .card h2 { font-size: 46px; font-weight: 800; margin-bottom: 20px; }
   .s2 .card p { font-size: 32px; color: #d1d5db; line-height: 1.5; }
   .s2 .card .points { margin-top: 36px; font-size: 26px; color: #10b981; font-weight: 700; }
-  .s2 .photo-strip {
-    display: flex; gap: 16px; margin-top: 40px; justify-content: center;
-  }
+  .s2 .photo-strip { display: flex; gap: 14px; margin-top: 36px; justify-content: center; }
   .s2 .photo-strip img {
-    width: 180px; height: 180px; border-radius: 20px; object-fit: cover;
+    width: 170px; height: 170px; border-radius: 20px; object-fit: cover;
     border: 3px solid rgba(16,185,129,0.3);
   }
   .s2 .badge-pill {
     display: inline-flex; align-items: center; gap: 12px;
     background: #10b981; color: #fff; font-size: 30px; font-weight: 700;
-    padding: 14px 36px; border-radius: 16px; margin-top: 40px; align-self: center;
+    padding: 14px 36px; border-radius: 16px; margin-top: 36px; align-self: center;
   }
 
-  /* SLIDE 3: BOLD — Intense party */
-  .s3 .bg { background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1080&q=80'); }
-  .s3 .overlay { background: linear-gradient(180deg, rgba(45,24,16,0.92) 0%, rgba(31,41,55,0.95) 100%); }
-  .s3 .content { align-items: stretch; }
+  /* S3: BOLD — Energetic outdoor party */
+  .s3 .bg { background-image: url('https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80'); }
+  .s3 .ov { background: linear-gradient(180deg, rgba(45,24,16,0.92) 0%, rgba(31,41,55,0.96) 100%); }
+  .s3 .ct { align-items: stretch; }
   .s3 .fire { text-align: center; font-size: 80px; margin-bottom: 16px; }
   .s3 .label {
     font-size: 28px; font-weight: 700; color: #f97316;
@@ -82,24 +80,16 @@
     box-shadow: 0 0 40px rgba(249,115,22,0.3);
   }
 
-  /* SLIDE 4: VS — Split screen */
-  .s4 { background: linear-gradient(180deg, #1f2937 0%, #111827 100%); }
-  .s4 .split {
-    display: flex; width: 100%; height: 100%;
-  }
+  /* S4: VS split — Two outdoor party photos */
+  .s4 { background: #111827; }
+  .s4 .split { display: flex; width: 100%; height: 100%; }
   .s4 .half {
     flex: 1; display: flex; flex-direction: column; align-items: center;
     justify-content: center; padding: 60px 40px; position: relative;
   }
-  .s4 .half-easy {
-    background: url('https://images.unsplash.com/photo-1528495612343-9ca9f4a4de28?w=540&q=80') center/cover;
-  }
-  .s4 .half-bold {
-    background: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=540&q=80') center/cover;
-  }
-  .s4 .half::before {
-    content: ''; position: absolute; inset: 0;
-  }
+  .s4 .half-easy { background: url('https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=600&q=80') center/cover; }
+  .s4 .half-bold { background: url('https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=600&q=80') center/cover; }
+  .s4 .half::before { content: ''; position: absolute; inset: 0; }
   .s4 .half-easy::before { background: rgba(16,185,129,0.7); }
   .s4 .half-bold::before { background: rgba(249,115,22,0.7); }
   .s4 .half * { position: relative; z-index: 1; }
@@ -113,9 +103,9 @@
     box-shadow: 0 0 40px rgba(251,191,36,0.5);
   }
 
-  /* SLIDE 5: CTA — Bar scene */
-  .s5 .bg { background-image: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=1080&q=80'); }
-  .s5 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(30,27,75,0.7) 50%, rgba(0,0,0,0.9) 100%); }
+  /* S5: CTA — Beer cheers outdoor */
+  .s5 .bg { background-image: url('https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1200&q=80'); }
+  .s5 .ov { background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(30,27,75,0.65) 50%, rgba(0,0,0,0.9) 100%); }
   .s5 .logo { font-size: 90px; font-weight: 900; color: #fbbf24; margin-bottom: 40px; text-shadow: 0 0 80px rgba(251,191,36,0.4); }
   .s5 h2 { font-size: 52px; font-weight: 800; line-height: 1.3; max-width: 800px; margin-bottom: 60px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
   .s5 .btn {
@@ -127,8 +117,8 @@
 <body>
 
 <div class="slide s1">
-  <div class="bg"></div><div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="emoji">🔥</div>
     <h1>Every task has <span class="orange">two versions</span></h1>
     <p>Do you play it safe... or go BOLD?</p>
@@ -136,8 +126,8 @@
 </div>
 
 <div class="slide s2">
-  <div class="bg"></div><div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="label">✅ Easy Mode</div>
     <div class="card">
       <h2>Stranger Selfie</h2>
@@ -145,17 +135,17 @@
       <div class="points">+1 point  ·  Standard badge progress</div>
     </div>
     <div class="photo-strip">
-      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="friends selfie">
-      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=300&q=80" alt="party">
-      <img src="https://images.unsplash.com/photo-1506869640319-fe1a24fd76cb?w=300&q=80" alt="group">
+      <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=300&q=80" alt="friends group">
+      <img src="https://images.unsplash.com/photo-1545128485-c400e7702796?w=300&q=80" alt="friends laughing">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&q=80" alt="outdoor fun">
     </div>
     <div class="badge-pill">🛡️ Safe & Fun</div>
   </div>
 </div>
 
 <div class="slide s3">
-  <div class="bg"></div><div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="fire">🔥🔥🔥</div>
     <div class="label">Bold Mode</div>
     <div class="card">
@@ -182,8 +172,8 @@
 </div>
 
 <div class="slide s5">
-  <div class="bg"></div><div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="logo">SpyShot</div>
     <h2>How bold are you willing to go?</h2>
     <div class="btn">Download Free</div>

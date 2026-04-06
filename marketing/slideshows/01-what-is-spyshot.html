@@ -17,72 +17,63 @@
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     text-align: center; color: #f9fafb; flex-shrink: 0;
   }
-  .slide .bg {
-    position: absolute; inset: 0; background-size: cover; background-position: center;
-  }
-  .slide .overlay {
-    position: absolute; inset: 0;
-  }
-  .slide .content {
+  .bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .ov { position: absolute; inset: 0; }
+  .ct {
     position: relative; z-index: 2; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    width: 100%; height: 100%; padding: 80px;
+    align-items: center; justify-content: center; width: 100%; height: 100%; padding: 80px;
   }
 
-  /* ===== SLIDE 1: HOOK — Photo of friends clinking glasses ===== */
-  .s1 .bg { background-image: url('https://images.unsplash.com/photo-1529543544282-ea444407faa3?w=1080&q=80'); }
-  .s1 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.8) 100%); }
-  .s1 .hook-small {
+  /* S1: HOOK — Friends group outdoor selfie with drinks */
+  .s1 .bg { background-image: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1200&q=80'); }
+  .s1 .ov { background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.75) 100%); }
+  .s1 .hook-sm {
     font-size: 32px; font-weight: 600; color: #fbbf24;
     letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px;
   }
-  .s1 .hook-big {
+  .s1 .hook-lg {
     font-size: 76px; font-weight: 900; line-height: 1.1; max-width: 900px;
-    text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    text-shadow: 0 4px 30px rgba(0,0,0,0.6);
   }
-  .s1 .hook-big span { color: #fbbf24; }
-  .s1 .swipe {
-    position: absolute; bottom: 80px; font-size: 26px; color: rgba(255,255,255,0.5);
-    letter-spacing: 3px;
-  }
+  .s1 .hook-lg span { color: #fbbf24; }
+  .s1 .swipe { position: absolute; bottom: 80px; font-size: 26px; color: rgba(255,255,255,0.4); letter-spacing: 3px; }
 
-  /* ===== SLIDE 2: THE PROBLEM — Bored people on phones ===== */
-  .s2 .bg { background-image: url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1080&q=80'); }
-  .s2 .overlay { background: linear-gradient(180deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.95) 100%); }
-  .s2 .content { justify-content: flex-start; padding-top: 180px; }
+  /* S2: PROBLEM — People bored on phones at gathering */
+  .s2 .bg { background-image: url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1200&q=80'); }
+  .s2 .ov { background: linear-gradient(180deg, rgba(15,23,42,0.88) 0%, rgba(15,23,42,0.95) 100%); }
+  .s2 .ct { justify-content: flex-start; padding-top: 180px; }
   .s2 h2 { font-size: 60px; font-weight: 800; line-height: 1.2; margin-bottom: 60px; }
   .s2 .problems { text-align: left; width: 100%; }
   .s2 .problem {
     font-size: 34px; color: #d1d5db; padding: 26px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     display: flex; align-items: center; gap: 20px;
   }
   .s2 .x { color: #ef4444; font-weight: 800; font-size: 38px; width: 50px; flex-shrink: 0; }
 
-  /* ===== SLIDE 3: SOLUTION — Party scene ===== */
-  .s3 .bg { background-image: url('https://images.unsplash.com/photo-1496024840928-4c417adf211d?w=1080&q=80'); }
-  .s3 .overlay { background: linear-gradient(180deg, rgba(15,23,42,0.9) 0%, rgba(30,27,75,0.85) 50%, rgba(15,23,42,0.95) 100%); }
+  /* S3: SOLUTION — Group of friends having fun outdoors */
+  .s3 .bg { background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1200&q=80'); }
+  .s3 .ov { background: linear-gradient(180deg, rgba(15,23,42,0.92) 0%, rgba(30,27,75,0.88) 50%, rgba(15,23,42,0.95) 100%); }
   .s3 .logo {
     font-size: 90px; font-weight: 900; color: #fbbf24; letter-spacing: 2px; margin-bottom: 20px;
     text-shadow: 0 0 60px rgba(251,191,36,0.3);
   }
-  .s3 .tagline { font-size: 38px; font-weight: 600; color: #e5e7eb; margin-bottom: 70px; }
-  .s3 .features { display: flex; flex-direction: column; gap: 24px; width: 100%; }
+  .s3 .tagline { font-size: 38px; font-weight: 600; color: #e5e7eb; margin-bottom: 60px; }
+  .s3 .features { display: flex; flex-direction: column; gap: 22px; width: 100%; }
   .s3 .feature {
-    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 24px; padding: 28px 36px;
-    display: flex; align-items: center; gap: 24px;
-    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 26px 36px;
+    display: flex; align-items: center; gap: 22px; backdrop-filter: blur(10px);
   }
-  .s3 .feature .icon { font-size: 44px; width: 60px; text-align: center; flex-shrink: 0; }
+  .s3 .feature .icon { font-size: 40px; width: 56px; text-align: center; flex-shrink: 0; }
   .s3 .feature .text { text-align: left; }
-  .s3 .feature h3 { font-size: 30px; font-weight: 700; margin-bottom: 4px; }
-  .s3 .feature p { font-size: 22px; color: #9ca3af; }
+  .s3 .feature h3 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .s3 .feature p { font-size: 21px; color: #9ca3af; }
 
-  /* ===== SLIDE 4: HOW IT WORKS — Friends at table ===== */
-  .s4 .bg { background-image: url('https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=1080&q=80'); }
-  .s4 .overlay { background: linear-gradient(180deg, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.88) 100%); }
-  .s4 .content { justify-content: flex-start; padding-top: 140px; }
+  /* S4: HOW IT WORKS — Friends at outdoor dinner/gathering */
+  .s4 .bg { background-image: url('https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1200&q=80'); }
+  .s4 .ov { background: linear-gradient(180deg, rgba(15,23,42,0.93) 0%, rgba(15,23,42,0.9) 100%); }
+  .s4 .ct { justify-content: flex-start; padding-top: 140px; }
   .s4 h2 { font-size: 54px; font-weight: 800; margin-bottom: 60px; }
   .s4 h2 span { color: #fbbf24; }
   .s4 .steps { display: flex; flex-direction: column; gap: 36px; width: 100%; }
@@ -96,27 +87,24 @@
   .s4 .step-content h3 { font-size: 34px; font-weight: 700; margin-bottom: 6px; }
   .s4 .step-content p { font-size: 24px; color: #9ca3af; line-height: 1.4; }
 
-  /* ===== SLIDE 5: SOCIAL PROOF — Friends laughing ===== */
-  .s5 .bg { background-image: url('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=1080&q=80'); }
-  .s5 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85) 100%); }
+  /* S5: SOCIAL PROOF — Friends laughing at outdoor party */
+  .s5 .bg { background-image: url('https://images.unsplash.com/photo-1545128485-c400e7702796?w=1200&q=80'); }
+  .s5 .ov { background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.8) 100%); }
   .s5 .quote-mark { font-size: 160px; color: #fbbf24; line-height: 0.5; margin-bottom: 40px; }
   .s5 .testimonial {
     font-size: 42px; font-weight: 600; line-height: 1.4; font-style: italic;
-    max-width: 850px; margin-bottom: 50px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    max-width: 850px; margin-bottom: 50px; text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   }
   .s5 .author { font-size: 28px; color: #fbbf24; font-weight: 700; margin-bottom: 8px; }
-  .s5 .author-sub { font-size: 22px; color: rgba(255,255,255,0.5); }
-  .s5 .stats {
-    display: flex; gap: 60px; margin-top: 100px;
-  }
+  .s5 .author-sub { font-size: 22px; color: rgba(255,255,255,0.4); }
+  .s5 .stats { display: flex; gap: 60px; margin-top: 100px; }
   .s5 .stat { text-align: center; }
   .s5 .stat-num { font-size: 52px; font-weight: 900; color: #fbbf24; }
-  .s5 .stat-label { font-size: 20px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+  .s5 .stat-label { font-size: 20px; color: rgba(255,255,255,0.5); margin-top: 6px; }
 
-  /* ===== SLIDE 6: CTA — Drinks closeup ===== */
-  .s6 .bg { background-image: url('https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=1080&q=80'); }
-  .s6 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(30,27,75,0.7) 50%, rgba(0,0,0,0.9) 100%); }
+  /* S6: CTA — Beers/drinks closeup outdoor */
+  .s6 .bg { background-image: url('https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1200&q=80'); }
+  .s6 .ov { background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(30,27,75,0.65) 50%, rgba(0,0,0,0.9) 100%); }
   .s6 .cta-logo {
     font-size: 100px; font-weight: 900; color: #fbbf24; letter-spacing: 3px; margin-bottom: 30px;
     text-shadow: 0 0 80px rgba(251,191,36,0.4);
@@ -127,33 +115,28 @@
   }
   .s6 .cta-button {
     background: #fbbf24; color: #111827; font-size: 36px; font-weight: 800;
-    padding: 28px 80px; border-radius: 20px;
-    box-shadow: 0 0 60px rgba(251,191,36,0.4);
+    padding: 28px 80px; border-radius: 20px; box-shadow: 0 0 60px rgba(251,191,36,0.4);
   }
   .s6 .cta-sub { font-size: 24px; color: rgba(255,255,255,0.4); margin-top: 30px; }
 </style>
 </head>
 <body>
 
-<!-- SLIDE 1: HOOK -->
 <div class="slide s1">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
-    <div class="hook-small">Your parties are about to change</div>
-    <div class="hook-big">The app that turns <span>any night out</span> into a legendary story</div>
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
+    <div class="hook-sm">Your parties are about to change</div>
+    <div class="hook-lg">The app that turns <span>any night out</span> into a legendary story</div>
     <div class="swipe">SWIPE →</div>
   </div>
 </div>
 
-<!-- SLIDE 2: THE PROBLEM -->
 <div class="slide s2">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <h2>We've all been there...</h2>
     <div class="problems">
-      <div class="problem"><span class="x">✕</span> Everyone's on their phone at the bar</div>
+      <div class="problem"><span class="x">✕</span> Everyone's on their phone at the party</div>
       <div class="problem"><span class="x">✕</span> Same boring conversations every weekend</div>
       <div class="problem"><span class="x">✕</span> No one wants to suggest a drinking game</div>
       <div class="problem"><span class="x">✕</span> The night has zero memorable moments</div>
@@ -162,11 +145,9 @@
   </div>
 </div>
 
-<!-- SLIDE 3: THE SOLUTION -->
 <div class="slide s3">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="logo">SpyShot</div>
     <div class="tagline">The party game that plays itself</div>
     <div class="features">
@@ -183,22 +164,20 @@
         <div class="text"><h3>Badges & Tiers</h3><p>Bronze to Mythic — flex your rank</p></div>
       </div>
       <div class="feature">
-        <div class="icon">👥</div>
-        <div class="text"><h3>Social Feed</h3><p>See what your friends are up to</p></div>
-      </div>
-      <div class="feature">
         <div class="icon">🔥</div>
         <div class="text"><h3>Bold Mode</h3><p>Risk it for 2x points</p></div>
+      </div>
+      <div class="feature">
+        <div class="icon">👥</div>
+        <div class="text"><h3>Social Feed</h3><p>Relive the night with your friends</p></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 4: HOW IT WORKS -->
 <div class="slide s4">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <h2>How <span>SpyShot</span> works</h2>
     <div class="steps">
       <div class="step">
@@ -219,7 +198,7 @@
         <div class="step-num">3</div>
         <div class="step-content">
           <h3>The app picks who & what</h3>
-          <p>Random player + challenge. Easy or Bold — you choose</p>
+          <p>Random player + challenge. Easy or Bold — your choice</p>
         </div>
       </div>
       <div class="step">
@@ -233,18 +212,16 @@
         <div class="step-num">5</div>
         <div class="step-content">
           <h3>Relive the night</h3>
-          <p>Feed, reactions, leaderboard — see everything the next day</p>
+          <p>Feed, reactions, leaderboard — see it all the next day</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 5: SOCIAL PROOF -->
 <div class="slide s5">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="quote-mark">"</div>
     <div class="testimonial">We used SpyShot at our house party and it was genuinely the most fun we've had in months. Everyone was crying laughing.</div>
     <div class="author">— @emma_w</div>
@@ -257,11 +234,9 @@
   </div>
 </div>
 
-<!-- SLIDE 6: CTA -->
 <div class="slide s6">
-  <div class="bg"></div>
-  <div class="overlay"></div>
-  <div class="content">
+  <div class="bg"></div><div class="ov"></div>
+  <div class="ct">
     <div class="cta-logo">SpyShot</div>
     <div class="cta-text">Your next night out deserves to be legendary</div>
     <div class="cta-button">Download Free</div>
