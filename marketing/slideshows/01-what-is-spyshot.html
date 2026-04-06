@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>SpyShot - What Is It?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #111;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding: 40px;
+    justify-content: center;
+  }
+
+  .slide {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #f9fafb;
+    flex-shrink: 0;
+  }
+
+  /* ===== SLIDE 1: HOOK ===== */
+  .slide-1 {
+    background: linear-gradient(160deg, #1f2937 0%, #0f172a 50%, #1e1b4b 100%);
+  }
+  .slide-1::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .slide-1::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    left: -150px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .slide-1 .hook-small {
+    font-size: 36px;
+    font-weight: 600;
+    color: #9ca3af;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    z-index: 1;
+  }
+  .slide-1 .hook-big {
+    font-size: 80px;
+    font-weight: 900;
+    line-height: 1.1;
+    max-width: 900px;
+    z-index: 1;
+    padding: 0 60px;
+  }
+  .slide-1 .hook-big span {
+    color: #fbbf24;
+  }
+  .slide-1 .hook-sub {
+    font-size: 32px;
+    color: #9ca3af;
+    margin-top: 50px;
+    z-index: 1;
+  }
+  .slide-1 .swipe {
+    position: absolute;
+    bottom: 80px;
+    font-size: 24px;
+    color: #6b7280;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    z-index: 1;
+  }
+
+  /* ===== SLIDE 2: THE PROBLEM ===== */
+  .slide-2 {
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    padding: 100px 80px;
+    justify-content: flex-start;
+    padding-top: 200px;
+  }
+  .slide-2 .emoji-row {
+    font-size: 100px;
+    margin-bottom: 60px;
+  }
+  .slide-2 h2 {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 50px;
+  }
+  .slide-2 .problems {
+    text-align: left;
+    width: 100%;
+  }
+  .slide-2 .problem {
+    font-size: 36px;
+    color: #d1d5db;
+    padding: 24px 0;
+    border-bottom: 1px solid #374151;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .slide-2 .problem .x {
+    color: #ef4444;
+    font-weight: 800;
+    font-size: 40px;
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  /* ===== SLIDE 3: THE SOLUTION ===== */
+  .slide-3 {
+    background: linear-gradient(160deg, #1e1b4b 0%, #1f2937 50%, #0f2920 100%);
+    padding: 80px;
+  }
+  .slide-3::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+  .slide-3 .logo {
+    font-size: 90px;
+    font-weight: 900;
+    color: #fbbf24;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    z-index: 1;
+  }
+  .slide-3 .tagline {
+    font-size: 40px;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 80px;
+    z-index: 1;
+  }
+  .slide-3 .features {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    z-index: 1;
+    width: 100%;
+  }
+  .slide-3 .feature {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .slide-3 .feature .icon {
+    font-size: 48px;
+    width: 70px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .slide-3 .feature .text {
+    text-align: left;
+  }
+  .slide-3 .feature .text h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .slide-3 .feature .text p {
+    font-size: 24px;
+    color: #9ca3af;
+  }
+
+  /* ===== SLIDE 4: HOW IT WORKS ===== */
+  .slide-4 {
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+    padding: 80px;
+    justify-content: flex-start;
+    padding-top: 140px;
+  }
+  .slide-4 h2 {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 70px;
+  }
+  .slide-4 h2 span { color: #fbbf24; }
+  .slide-4 .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+  }
+  .slide-4 .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+  }
+  .slide-4 .step-num {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #fbbf24;
+    color: #111827;
+    font-size: 36px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .slide-4 .step-content h3 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .slide-4 .step-content p {
+    font-size: 26px;
+    color: #9ca3af;
+    line-height: 1.4;
+  }
+
+  /* ===== SLIDE 5: SOCIAL PROOF ===== */
+  .slide-5 {
+    background: linear-gradient(160deg, #0f2920 0%, #1f2937 50%, #1e1b4b 100%);
+    padding: 80px;
+  }
+  .slide-5::before {
+    content: '';
+    position: absolute;
+    top: 100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .slide-5 .quote-mark {
+    font-size: 160px;
+    color: #fbbf24;
+    line-height: 0.5;
+    margin-bottom: 40px;
+    z-index: 1;
+  }
+  .slide-5 .testimonial {
+    font-size: 44px;
+    font-weight: 600;
+    line-height: 1.4;
+    font-style: italic;
+    max-width: 850px;
+    margin-bottom: 50px;
+    z-index: 1;
+  }
+  .slide-5 .author {
+    font-size: 28px;
+    color: #fbbf24;
+    font-weight: 700;
+    z-index: 1;
+    margin-bottom: 12px;
+  }
+  .slide-5 .author-sub {
+    font-size: 24px;
+    color: #6b7280;
+    z-index: 1;
+  }
+  .slide-5 .stats {
+    display: flex;
+    gap: 60px;
+    margin-top: 100px;
+    z-index: 1;
+  }
+  .slide-5 .stat {
+    text-align: center;
+  }
+  .slide-5 .stat-num {
+    font-size: 56px;
+    font-weight: 900;
+    color: #fbbf24;
+  }
+  .slide-5 .stat-label {
+    font-size: 22px;
+    color: #9ca3af;
+    margin-top: 8px;
+  }
+
+  /* ===== SLIDE 6: CTA ===== */
+  .slide-6 {
+    background: linear-gradient(160deg, #1f2937 0%, #111827 40%, #1e1b4b 100%);
+  }
+  .slide-6::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1000px;
+    height: 1000px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
+    border-radius: 50%;
+  }
+  .slide-6 .cta-logo {
+    font-size: 100px;
+    font-weight: 900;
+    color: #fbbf24;
+    letter-spacing: 3px;
+    margin-bottom: 30px;
+    z-index: 1;
+  }
+  .slide-6 .cta-text {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.3;
+    max-width: 800px;
+    margin-bottom: 60px;
+    z-index: 1;
+  }
+  .slide-6 .cta-button {
+    background: #fbbf24;
+    color: #111827;
+    font-size: 36px;
+    font-weight: 800;
+    padding: 28px 80px;
+    border-radius: 20px;
+    z-index: 1;
+    box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+  }
+  .slide-6 .cta-sub {
+    font-size: 24px;
+    color: #6b7280;
+    margin-top: 30px;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: HOOK -->
+<div class="slide slide-1">
+  <div class="hook-small">Your parties are about to change</div>
+  <div class="hook-big">The app that turns <span>any night out</span> into a legendary story</div>
+  <div class="hook-sub">Swipe to see how →</div>
+  <div class="swipe">SLIDE 1 OF 6</div>
+</div>
+
+<!-- SLIDE 2: THE PROBLEM -->
+<div class="slide slide-2">
+  <div class="emoji-row">😴📱🥱</div>
+  <h2>We've all been there...</h2>
+  <div class="problems">
+    <div class="problem"><span class="x">✕</span> Everyone's on their phone at the bar</div>
+    <div class="problem"><span class="x">✕</span> Same boring conversations every weekend</div>
+    <div class="problem"><span class="x">✕</span> No one wants to suggest a drinking game</div>
+    <div class="problem"><span class="x">✕</span> The night has zero memorable moments</div>
+    <div class="problem"><span class="x">✕</span> Nothing to look back on the next day</div>
+  </div>
+</div>
+
+<!-- SLIDE 3: THE SOLUTION -->
+<div class="slide slide-3">
+  <div class="logo">SpyShot</div>
+  <div class="tagline">The party game that plays itself</div>
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🎯</div>
+      <div class="text">
+        <h3>Random Challenges</h3>
+        <p>120+ tasks from chill to extreme</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="icon">📸</div>
+      <div class="text">
+        <h3>Photo Proof</h3>
+        <p>Capture every legendary moment</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="icon">🏆</div>
+      <div class="text">
+        <h3>Badges & Tiers</h3>
+        <p>Bronze to Mythic — flex your rank</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="icon">👥</div>
+      <div class="text">
+        <h3>Social Feed</h3>
+        <p>See what your friends are up to</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: HOW IT WORKS -->
+<div class="slide slide-4">
+  <h2>How <span>SpyShot</span> works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Create a group</h3>
+        <p>Invite your friends or share a 4-digit room code with anyone at the party</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Pick your vibe</h3>
+        <p>Chill, Wild, or Extreme — you control the intensity</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>The app picks who & what</h3>
+        <p>Random player shuffle + a challenge. Easy mode or Bold for 2x points</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>Complete & prove it</h3>
+        <p>Take a photo, beat the timer, or just do the dare. Earn badges that level up</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>Relive the night</h3>
+        <p>Check the feed the next day. React to your friends' best moments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: SOCIAL PROOF -->
+<div class="slide slide-5">
+  <div class="quote-mark">"</div>
+  <div class="testimonial">We used SpyShot at our house party last weekend and it was genuinely the most fun we've had in months. Everyone was crying laughing.</div>
+  <div class="author">— @emma_w</div>
+  <div class="author-sub">Gold tier badge holder</div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">120+</div>
+      <div class="stat-label">Challenges</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Intensity Levels</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">9</div>
+      <div class="stat-label">Badge Tiers</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: CTA -->
+<div class="slide slide-6">
+  <div class="cta-logo">SpyShot</div>
+  <div class="cta-text">Your next night out deserves to be legendary</div>
+  <div class="cta-button">Download Free</div>
+  <div class="cta-sub">Available on iOS & Android</div>
+</div>
+
+</body>
+</html>

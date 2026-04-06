@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SpyShot - Pick Your Vibe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #111;
+    display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; justify-content: center;
+  }
+  .slide {
+    width: 1080px; height: 1920px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; color: #f9fafb; flex-shrink: 0; padding: 80px;
+  }
+
+  /* HOOK */
+  .s1 { background: linear-gradient(160deg, #1f2937, #0f172a); }
+  .s1 h1 { font-size: 68px; font-weight: 900; line-height: 1.15; }
+  .s1 h1 span { color: #fbbf24; }
+  .s1 .emojis { font-size: 80px; margin-bottom: 50px; letter-spacing: 20px; }
+  .s1 p { font-size: 30px; color: #9ca3af; margin-top: 40px; }
+
+  /* CHILL */
+  .s2 {
+    background: linear-gradient(160deg, #0c1b2f 0%, #1e3a5f 50%, #1f2937 100%);
+  }
+  .s2::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .s2 .mode-emoji { font-size: 120px; margin-bottom: 30px; z-index: 1; }
+  .s2 .mode-name {
+    font-size: 72px; font-weight: 900; color: #3b82f6; margin-bottom: 20px; z-index: 1;
+    text-transform: uppercase; letter-spacing: 6px;
+  }
+  .s2 .mode-desc { font-size: 34px; color: #93c5fd; margin-bottom: 60px; z-index: 1; }
+  .s2 .tasks {
+    display: flex; flex-direction: column; gap: 20px; width: 100%; z-index: 1;
+  }
+  .s2 .task {
+    background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 20px; padding: 28px 36px; text-align: left;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .s2 .task-icon { font-size: 36px; width: 50px; text-align: center; }
+  .s2 .task-text { font-size: 28px; color: #e5e7eb; }
+
+  /* WILD */
+  .s3 {
+    background: linear-gradient(160deg, #2d1810 0%, #78350f 30%, #1f2937 100%);
+  }
+  .s3::before {
+    content: ''; position: absolute; bottom: -100px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .s3 .mode-emoji { font-size: 120px; margin-bottom: 30px; z-index: 1; }
+  .s3 .mode-name {
+    font-size: 72px; font-weight: 900; color: #f97316; margin-bottom: 20px; z-index: 1;
+    text-transform: uppercase; letter-spacing: 6px;
+  }
+  .s3 .mode-desc { font-size: 34px; color: #fdba74; margin-bottom: 60px; z-index: 1; }
+  .s3 .tasks {
+    display: flex; flex-direction: column; gap: 20px; width: 100%; z-index: 1;
+  }
+  .s3 .task {
+    background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2);
+    border-radius: 20px; padding: 28px 36px; text-align: left;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .s3 .task-icon { font-size: 36px; width: 50px; text-align: center; }
+  .s3 .task-text { font-size: 28px; color: #e5e7eb; }
+
+  /* EXTREME */
+  .s4 {
+    background: linear-gradient(160deg, #2d0a1e 0%, #831843 30%, #1f2937 100%);
+  }
+  .s4::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .s4 .mode-emoji { font-size: 120px; margin-bottom: 30px; z-index: 1; }
+  .s4 .mode-name {
+    font-size: 72px; font-weight: 900; color: #ec4899; margin-bottom: 20px; z-index: 1;
+    text-transform: uppercase; letter-spacing: 6px;
+  }
+  .s4 .mode-desc { font-size: 34px; color: #f9a8d4; margin-bottom: 60px; z-index: 1; }
+  .s4 .tasks {
+    display: flex; flex-direction: column; gap: 20px; width: 100%; z-index: 1;
+  }
+  .s4 .task {
+    background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.2);
+    border-radius: 20px; padding: 28px 36px; text-align: left;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .s4 .task-icon { font-size: 36px; width: 50px; text-align: center; }
+  .s4 .task-text { font-size: 28px; color: #e5e7eb; }
+  .s4 .warning {
+    margin-top: 40px; font-size: 24px; color: #ec4899; font-weight: 600;
+    z-index: 1; font-style: italic;
+  }
+
+  /* CTA */
+  .s5 { background: linear-gradient(160deg, #1f2937, #111827); }
+  .s5 .logo { font-size: 80px; font-weight: 900; color: #fbbf24; margin-bottom: 40px; }
+  .s5 h2 { font-size: 52px; font-weight: 800; line-height: 1.3; max-width: 800px; margin-bottom: 50px; }
+  .s5 .modes {
+    display: flex; gap: 24px; margin-bottom: 60px;
+  }
+  .s5 .mode-pill {
+    padding: 16px 36px; border-radius: 50px; font-size: 28px; font-weight: 700;
+  }
+  .s5 .chill { background: rgba(59,130,246,0.2); color: #3b82f6; border: 2px solid rgba(59,130,246,0.3); }
+  .s5 .wild { background: rgba(249,115,22,0.2); color: #f97316; border: 2px solid rgba(249,115,22,0.3); }
+  .s5 .extreme { background: rgba(236,72,153,0.2); color: #ec4899; border: 2px solid rgba(236,72,153,0.3); }
+  .s5 .btn {
+    background: #fbbf24; color: #111827; font-size: 36px; font-weight: 800;
+    padding: 28px 80px; border-radius: 20px;
+    box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+  }
+</style>
+</head>
+<body>
+
+<div class="slide s1">
+  <div class="emojis">😎 🔥 💀</div>
+  <h1>Not every night is the <span>same vibe</span></h1>
+  <p>That's why SpyShot has 3 intensity modes</p>
+</div>
+
+<div class="slide s2">
+  <div class="mode-emoji">😎</div>
+  <div class="mode-name">Chill</div>
+  <div class="mode-desc">Icebreakers & light fun</div>
+  <div class="tasks">
+    <div class="task"><div class="task-icon">🎤</div><div class="task-text">Sing the first line of your last song</div></div>
+    <div class="task"><div class="task-icon">📱</div><div class="task-text">Show your 7th camera roll photo</div></div>
+    <div class="task"><div class="task-icon">🤝</div><div class="task-text">Compliment everyone at the table</div></div>
+    <div class="task"><div class="task-icon">🎭</div><div class="task-text">Celebrity impression contest</div></div>
+    <div class="task"><div class="task-icon">💬</div><div class="task-text">Two truths and one lie</div></div>
+  </div>
+</div>
+
+<div class="slide s3">
+  <div class="mode-emoji">🔥</div>
+  <div class="mode-name">Wild</div>
+  <div class="mode-desc">Classic party mode</div>
+  <div class="tasks">
+    <div class="task"><div class="task-icon">💃</div><div class="task-text">Challenge someone to a dance-off</div></div>
+    <div class="task"><div class="task-icon">💍</div><div class="task-text">Fake propose to a stranger</div></div>
+    <div class="task"><div class="task-icon">🎸</div><div class="task-text">30-second air guitar solo with power slide</div></div>
+    <div class="task"><div class="task-icon">📸</div><div class="task-text">Photobomb as many photos as possible in 60s</div></div>
+    <div class="task"><div class="task-icon">🎵</div><div class="task-text">Request a song — if it plays, everyone else drinks</div></div>
+  </div>
+</div>
+
+<div class="slide s4">
+  <div class="mode-emoji">💀</div>
+  <div class="mode-name">Extreme</div>
+  <div class="mode-desc">Late night chaos</div>
+  <div class="tasks">
+    <div class="task"><div class="task-icon">🎤</div><div class="task-text">Sing a duet with a complete stranger</div></div>
+    <div class="task"><div class="task-icon">🏄</div><div class="task-text">Get 3 people to lift you — crowd surf</div></div>
+    <div class="task"><div class="task-icon">🍋</div><div class="task-text">Eat a lemon without making a face</div></div>
+    <div class="task"><div class="task-icon">🎙️</div><div class="task-text">Give a speech standing on a chair</div></div>
+    <div class="task"><div class="task-icon">🔥</div><div class="task-text">Full roast battle — group votes the winner</div></div>
+  </div>
+  <div class="warning">* Not for the faint of heart</div>
+</div>
+
+<div class="slide s5">
+  <div class="logo">SpyShot</div>
+  <h2>Pick your vibe. Start the game.</h2>
+  <div class="modes">
+    <div class="mode-pill chill">Chill</div>
+    <div class="mode-pill wild">Wild</div>
+    <div class="mode-pill extreme">Extreme</div>
+  </div>
+  <div class="btn">Download Free</div>
+</div>
+
+</body>
+</html>
