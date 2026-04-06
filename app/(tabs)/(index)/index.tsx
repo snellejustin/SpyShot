@@ -19,6 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../contexts/AuthContext';
 import { authService } from '../../../services/authService';
+import { haptic } from '../../../utils/haptics';
 
 const REACTION_EMOJIS = [
     { key: 'fire', label: '\u{1F525}' },
@@ -78,6 +79,8 @@ export default function HomeScreen() {
     const [timeUntilNext, setTimeUntilNext] = useState('');
     const [gameTimeRemaining, setGameTimeRemaining] = useState('');
     const [openReactionId, setOpenReactionId] = useState<string | null>(null);
+    const [isReady, setIsReady] = useState(false);
+    const [readyFriends, setReadyFriends] = useState<any[]>([]);
     const pulseAnim = useRef(new Animated.Value(1)).current;
 
     const loadFeed = useCallback(async () => {
@@ -105,12 +108,32 @@ export default function HomeScreen() {
         }
     }, [user]);
 
+    const loadReadyFriends = useCallback(async () => {
+        if (!user) return;
+        const ready = await authService.getReadyFriends(user.id);
+        setReadyFriends(ready);
+    }, [user]);
+
+    const toggleReady = async () => {
+        if (!user) return;
+        haptic.medium();
+        const newReady = !isReady;
+        setIsReady(newReady);
+        try {
+            await authService.setReadyToPlay(user.id, newReady);
+            if (newReady) loadReadyFriends();
+        } catch {
+            setIsReady(!newReady); // revert
+        }
+    };
+
     useEffect(() => {
         if (user) {
             refreshNotificationCount();
             loadActiveGame();
+            loadReadyFriends();
         }
-    }, [user, refreshNotificationCount, loadActiveGame]);
+    }, [user, refreshNotificationCount, loadActiveGame, loadReadyFriends]);
 
     useEffect(() => {
         setLoading(true);
@@ -156,6 +179,7 @@ export default function HomeScreen() {
 
     const handleReaction = async (feedItemId: string, emoji: string) => {
         if (!user) return;
+        haptic.light();
         const item = feed.find(f => f.id === feedItemId);
         const existing = item?.reactions.find(r => r.user_id === user.id);
 
@@ -371,31 +395,70 @@ export default function HomeScreen() {
                         />
                     }
                     ListHeaderComponent={
-                        activeGameSession ? (
-                            <Animated.View style={[styles.activeGameContainer, { transform: [{ scale: pulseAnim }] }]}>
-                                <TouchableOpacity style={styles.activeGameCard} onPress={handleJoinActiveGame}>
-                                    <View style={styles.activeGameContent}>
-                                        <View style={styles.activeGameRow}>
-                                            <Ionicons name="game-controller" size={18} color={COLORS.white} />
-                                            <ThemedText style={styles.activeGameTitle}>
-                                                {activeGameSession.group?.name || 'Active Game'}
-                                            </ThemedText>
-                                        </View>
-                                        <View style={styles.activeGameTimers}>
-                                            <View style={styles.timerChip}>
-                                                <Ionicons name="timer" size={14} color={COLORS.white} />
-                                                <ThemedText style={styles.timerText}>{timeUntilNext}</ThemedText>
+                        <View>
+                            {/* Active game card */}
+                            {activeGameSession && (
+                                <Animated.View style={[styles.activeGameContainer, { transform: [{ scale: pulseAnim }] }]}>
+                                    <TouchableOpacity style={styles.activeGameCard} onPress={handleJoinActiveGame}>
+                                        <View style={styles.activeGameContent}>
+                                            <View style={styles.activeGameRow}>
+                                                <Ionicons name="game-controller" size={18} color={COLORS.white} />
+                                                <ThemedText style={styles.activeGameTitle}>
+                                                    {activeGameSession.group?.name || 'Active Game'}
+                                                </ThemedText>
                                             </View>
-                                            <View style={styles.timerChip}>
-                                                <Ionicons name="hourglass" size={14} color={COLORS.white} />
-                                                <ThemedText style={styles.timerText}>{gameTimeRemaining}</ThemedText>
+                                            <View style={styles.activeGameTimers}>
+                                                <View style={styles.timerChip}>
+                                                    <Ionicons name="timer" size={14} color={COLORS.white} />
+                                                    <ThemedText style={styles.timerText}>{timeUntilNext}</ThemedText>
+                                                </View>
+                                                <View style={styles.timerChip}>
+                                                    <Ionicons name="hourglass" size={14} color={COLORS.white} />
+                                                    <ThemedText style={styles.timerText}>{gameTimeRemaining}</ThemedText>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                    <Ionicons name="chevron-forward" size={22} color={COLORS.white} />
-                                </TouchableOpacity>
-                            </Animated.View>
-                        ) : null
+                                        <Ionicons name="chevron-forward" size={22} color={COLORS.white} />
+                                    </TouchableOpacity>
+                                </Animated.View>
+                            )}
+
+                            {/* Who's Down? */}
+                            {tab === 'friends' && (
+                                <View style={styles.readySection}>
+                                    <TouchableOpacity
+                                        style={[styles.readyToggle, isReady && styles.readyToggleActive]}
+                                        onPress={toggleReady}
+                                    >
+                                        <Ionicons name={isReady ? 'flash' : 'flash-outline'} size={16} color={isReady ? COLORS.gray900 : COLORS.partyGreen} />
+                                        <ThemedText style={[styles.readyToggleText, isReady && styles.readyToggleTextActive]}>
+                                            {isReady ? "You're down!" : "I'm down to play"}
+                                        </ThemedText>
+                                    </TouchableOpacity>
+                                    {readyFriends.length > 0 && (
+                                        <View style={styles.readyFriends}>
+                                            {readyFriends.slice(0, 5).map((f: any) => (
+                                                <View key={f.id} style={styles.readyFriendChip}>
+                                                    {f.profile_picture ? (
+                                                        <Image source={{ uri: f.profile_picture }} style={styles.readyAvatar} />
+                                                    ) : (
+                                                        <View style={[styles.readyAvatar, styles.readyAvatarPlaceholder]}>
+                                                            <Text style={{ fontSize: 10, fontWeight: '700', color: COLORS.text }}>
+                                                                {f.username?.charAt(0).toUpperCase()}
+                                                            </Text>
+                                                        </View>
+                                                    )}
+                                                    <ThemedText style={styles.readyFriendName}>@{f.username}</ThemedText>
+                                                </View>
+                                            ))}
+                                            {readyFriends.length > 5 && (
+                                                <ThemedText style={styles.readyMore}>+{readyFriends.length - 5} more</ThemedText>
+                                            )}
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+                        </View>
                     }
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
@@ -531,6 +594,70 @@ const styles = StyleSheet.create({
         fontSize: TYPOGRAPHY.xs,
         fontWeight: '600',
         color: COLORS.white,
+    },
+    // Who's Down
+    readySection: {
+        paddingHorizontal: SPACING.lg,
+        paddingTop: SPACING.md,
+        paddingBottom: SPACING.sm,
+    },
+    readyToggle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.lg,
+        borderRadius: BORDER_RADIUS.xl,
+        borderWidth: 1,
+        borderColor: COLORS.partyGreen,
+        gap: SPACING.sm,
+    },
+    readyToggleActive: {
+        backgroundColor: COLORS.partyGreen,
+        borderColor: COLORS.partyGreen,
+    },
+    readyToggleText: {
+        fontSize: TYPOGRAPHY.sm,
+        fontWeight: '600',
+        color: COLORS.partyGreen,
+    },
+    readyToggleTextActive: {
+        color: COLORS.gray900,
+    },
+    readyFriends: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: SPACING.sm,
+        gap: SPACING.sm,
+        flexWrap: 'wrap',
+    },
+    readyFriendChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.surface,
+        paddingHorizontal: SPACING.sm,
+        paddingVertical: 4,
+        borderRadius: BORDER_RADIUS.xl,
+        gap: 4,
+    },
+    readyAvatar: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+    },
+    readyAvatarPlaceholder: {
+        backgroundColor: COLORS.border,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    readyFriendName: {
+        fontSize: 11,
+        color: COLORS.text,
+        fontWeight: '500',
+    },
+    readyMore: {
+        fontSize: 11,
+        color: COLORS.textMuted,
     },
     // Feed item
     feedCard: {

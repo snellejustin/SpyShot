@@ -526,7 +526,7 @@ class AuthService {
       // Get profile information for all friends
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, username, name, profile_picture')
+        .select('id, username, name, profile_picture, ready_to_play, ready_until')
         .in('id', allFriendIds);
 
       if (profileError) throw profileError;
@@ -939,13 +939,34 @@ class AuthService {
         .in('intensity', intensityFilter);
 
       if (tasksError) throw tasksError;
-      if (!tasks || tasks.length === 0) {
+
+      // Also fetch custom tasks for this group
+      const { data: customTasks } = await supabase
+        .from('custom_tasks')
+        .select('*')
+        .eq('group_id', groupId)
+        .eq('active', true)
+        .in('intensity', intensityFilter);
+
+      // Merge standard + custom tasks (custom tasks get same shape)
+      const allTasks = [
+        ...(tasks || []),
+        ...(customTasks || []).map((ct: any) => ({
+          ...ct,
+          badge_name: null,
+          badge_description: null,
+          bold_description: null,
+          difficulty_level: 2,
+        })),
+      ];
+
+      if (allTasks.length === 0) {
         throw new Error('No game tasks available');
       }
 
       // Randomly select a player and task
       const randomPlayer = members[Math.floor(Math.random() * members.length)];
-      const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+      const randomTask = allTasks[Math.floor(Math.random() * allTasks.length)];
 
       // Get current round number
       const { data: sessionData, error: sessionError } = await supabase
@@ -1635,6 +1656,215 @@ class AuthService {
       }
 
       return session;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  // ============================================================
+  // WHO'S DOWN METHODS
+  // ============================================================
+
+  async setReadyToPlay(userId: string, ready: boolean): Promise<void> {
+    try {
+      const readyUntil = ready ? new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() : null;
+      await supabase
+        .from('profiles')
+        .update({ ready_to_play: ready, ready_until: readyUntil })
+        .eq('id', userId);
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async getReadyFriends(userId: string): Promise<any[]> {
+    try {
+      const friends = await this.getFriends(userId);
+      const now = new Date().toISOString();
+      return friends.filter((f: any) => f.ready_to_play && f.ready_until && f.ready_until > now);
+    } catch {
+      return [];
+    }
+  }
+
+  // ============================================================
+  // HALL OF FAME METHODS
+  // ============================================================
+
+  async getSessionPhotos(sessionId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('game_rounds')
+        .select(`
+          id, photo_url, status,
+          task:game_tasks(title),
+          player:profiles!game_rounds_selected_player_id_fkey(id, username, profile_picture)
+        `)
+        .eq('session_id', sessionId)
+        .eq('status', 'completed')
+        .not('photo_url', 'is', null);
+
+      if (error) throw error;
+      return data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async voteForPhoto(sessionId: string, roundId: string, voterId: string): Promise<void> {
+    try {
+      await supabase
+        .from('hall_of_fame_votes')
+        .upsert({
+          session_id: sessionId,
+          round_id: roundId,
+          voter_id: voterId,
+        }, { onConflict: 'session_id,voter_id' });
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async getGroupHallOfFame(groupId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('hall_of_fame')
+        .select(`
+          *,
+          player:profiles!hall_of_fame_player_id_fkey(id, username, profile_picture)
+        `)
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      return data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  // ============================================================
+  // COSMETICS METHODS
+  // ============================================================
+
+  async getAllCosmetics(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('cosmetics')
+        .select('*')
+        .order('type', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async getPlayerCosmetics(playerId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('player_cosmetics')
+        .select('*, cosmetic:cosmetics(*)')
+        .eq('player_id', playerId);
+
+      if (error) throw error;
+      return data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async equipCosmetic(userId: string, cosmeticKey: string, type: string): Promise<void> {
+    try {
+      const updateField = type === 'frame' ? 'equipped_frame'
+        : type === 'title' ? 'equipped_title'
+        : 'profile_color';
+
+      await supabase
+        .from('profiles')
+        .update({ [updateField]: cosmeticKey })
+        .eq('id', userId);
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async unlockCosmetic(userId: string, cosmeticKey: string): Promise<void> {
+    try {
+      await supabase
+        .from('player_cosmetics')
+        .upsert({
+          player_id: userId,
+          cosmetic_key: cosmeticKey,
+          unlocked_at: new Date().toISOString(),
+        }, { onConflict: 'player_id,cosmetic_key' });
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  // ============================================================
+  // CUSTOM TASKS METHODS
+  // ============================================================
+
+  async getCustomTasks(groupId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('custom_tasks')
+        .select(`
+          *,
+          creator:profiles!custom_tasks_created_by_fkey(username)
+        `)
+        .eq('group_id', groupId)
+        .eq('active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  async createCustomTask(data: {
+    groupId: string;
+    createdBy: string;
+    title: string;
+    description: string;
+    requiresPhoto?: boolean;
+    requiresTimer?: boolean;
+    intensity?: string;
+  }): Promise<any> {
+    try {
+      const { data: task, error } = await supabase
+        .from('custom_tasks')
+        .insert([{
+          group_id: data.groupId,
+          created_by: data.createdBy,
+          title: data.title,
+          description: data.description,
+          requires_photo: data.requiresPhoto || false,
+          requires_timer: data.requiresTimer || false,
+          intensity: data.intensity || 'wild',
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return task;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  async deleteCustomTask(taskId: string): Promise<void> {
+    try {
+      await supabase
+        .from('custom_tasks')
+        .update({ active: false })
+        .eq('id', taskId);
     } catch (error: any) {
       throw new Error(error.message);
     }

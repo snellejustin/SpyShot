@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
 import { supabase } from '../config/supabase';
+import { haptic } from '../utils/haptics';
 
 interface GameSession {
     id: string;
@@ -222,6 +223,7 @@ export default function GameActiveScreen() {
             // Simple completion
             try {
                 await authService.completeGameRound(currentRound.id);
+                haptic.success();
                 Alert.alert('Task Completed! ✅', 'Well done! Wait for the next task.');
                 setCurrentRound(null);
                 setJustCompletedTask(true);
