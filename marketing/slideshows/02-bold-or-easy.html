@@ -7,199 +7,187 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', sans-serif;
-    background: #111;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    padding: 40px;
-    justify-content: center;
+    font-family: 'Inter', sans-serif; background: #111;
+    display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; justify-content: center;
   }
   .slide {
-    width: 1080px;
-    height: 1920px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #f9fafb;
-    flex-shrink: 0;
-    padding: 80px;
+    width: 1080px; height: 1920px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; color: #f9fafb; flex-shrink: 0;
+  }
+  .bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .overlay { position: absolute; inset: 0; }
+  .content {
+    position: relative; z-index: 2; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; width: 100%; height: 100%; padding: 80px;
   }
 
-  /* SLIDE 1: HOOK */
-  .s1 { background: linear-gradient(160deg, #1f2937 0%, #0f172a 100%); }
-  .s1 .emoji { font-size: 120px; margin-bottom: 50px; }
-  .s1 h1 { font-size: 72px; font-weight: 900; line-height: 1.1; }
-  .s1 h1 span { color: #f97316; }
-  .s1 h1 .yellow { color: #fbbf24; }
-  .s1 p { font-size: 32px; color: #9ca3af; margin-top: 40px; }
+  /* SLIDE 1: HOOK — Group cheersing */
+  .s1 .bg { background-image: url('https://images.unsplash.com/photo-1575444758702-4a6b9222336e?w=1080&q=80'); }
+  .s1 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%); }
+  .s1 .emoji { font-size: 100px; margin-bottom: 40px; }
+  .s1 h1 { font-size: 70px; font-weight: 900; line-height: 1.1; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+  .s1 h1 .orange { color: #f97316; }
+  .s1 p { font-size: 30px; color: rgba(255,255,255,0.6); margin-top: 40px; }
 
-  /* SLIDE 2: EASY OPTION */
-  .s2 {
-    background: linear-gradient(160deg, #0f2920 0%, #1f2937 100%);
-    align-items: stretch;
-  }
+  /* SLIDE 2: EASY — Chill selfie scene */
+  .s2 .bg { background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1080&q=80'); }
+  .s2 .overlay { background: linear-gradient(180deg, rgba(15,41,32,0.92) 0%, rgba(31,41,55,0.95) 100%); }
+  .s2 .content { align-items: stretch; }
   .s2 .label {
     font-size: 28px; font-weight: 700; color: #10b981;
-    text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px;
-    text-align: center;
+    text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; text-align: center;
   }
   .s2 .card {
-    background: rgba(16, 185, 129, 0.1);
-    border: 2px solid rgba(16, 185, 129, 0.3);
-    border-radius: 32px;
-    padding: 60px;
-    text-align: left;
+    background: rgba(16,185,129,0.1); border: 2px solid rgba(16,185,129,0.3);
+    border-radius: 32px; padding: 50px; text-align: left;
   }
-  .s2 .card h2 { font-size: 48px; font-weight: 800; margin-bottom: 24px; }
-  .s2 .card p { font-size: 34px; color: #d1d5db; line-height: 1.5; }
-  .s2 .card .points {
-    margin-top: 40px; font-size: 28px; color: #10b981; font-weight: 700;
+  .s2 .card h2 { font-size: 46px; font-weight: 800; margin-bottom: 20px; }
+  .s2 .card p { font-size: 32px; color: #d1d5db; line-height: 1.5; }
+  .s2 .card .points { margin-top: 36px; font-size: 26px; color: #10b981; font-weight: 700; }
+  .s2 .photo-strip {
+    display: flex; gap: 16px; margin-top: 40px; justify-content: center;
   }
-  .s2 .badge {
+  .s2 .photo-strip img {
+    width: 180px; height: 180px; border-radius: 20px; object-fit: cover;
+    border: 3px solid rgba(16,185,129,0.3);
+  }
+  .s2 .badge-pill {
     display: inline-flex; align-items: center; gap: 12px;
-    background: #10b981; color: #fff; font-size: 32px; font-weight: 700;
-    padding: 16px 36px; border-radius: 16px; margin-top: 50px;
-    align-self: center;
+    background: #10b981; color: #fff; font-size: 30px; font-weight: 700;
+    padding: 14px 36px; border-radius: 16px; margin-top: 40px; align-self: center;
   }
 
-  /* SLIDE 3: BOLD OPTION */
-  .s3 {
-    background: linear-gradient(160deg, #2d1810 0%, #1f2937 100%);
-    align-items: stretch;
-  }
+  /* SLIDE 3: BOLD — Intense party */
+  .s3 .bg { background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1080&q=80'); }
+  .s3 .overlay { background: linear-gradient(180deg, rgba(45,24,16,0.92) 0%, rgba(31,41,55,0.95) 100%); }
+  .s3 .content { align-items: stretch; }
+  .s3 .fire { text-align: center; font-size: 80px; margin-bottom: 16px; }
   .s3 .label {
     font-size: 28px; font-weight: 700; color: #f97316;
-    text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px;
-    text-align: center;
+    text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; text-align: center;
   }
-  .s3 .fire { text-align: center; font-size: 80px; margin-bottom: 20px; }
   .s3 .card {
-    background: rgba(249, 115, 22, 0.1);
-    border: 2px solid rgba(249, 115, 22, 0.3);
-    border-radius: 32px;
-    padding: 60px;
-    text-align: left;
+    background: rgba(249,115,22,0.1); border: 2px solid rgba(249,115,22,0.3);
+    border-radius: 32px; padding: 50px; text-align: left;
   }
-  .s3 .card h2 { font-size: 48px; font-weight: 800; margin-bottom: 24px; }
-  .s3 .card p { font-size: 34px; color: #d1d5db; line-height: 1.5; }
-  .s3 .card .points {
-    margin-top: 40px; font-size: 28px; color: #f97316; font-weight: 700;
-  }
+  .s3 .card h2 { font-size: 46px; font-weight: 800; margin-bottom: 20px; }
+  .s3 .card p { font-size: 32px; color: #d1d5db; line-height: 1.5; }
+  .s3 .card strong { color: #f97316; }
+  .s3 .card .points { margin-top: 36px; font-size: 26px; color: #f97316; font-weight: 700; }
   .s3 .multiplier {
     display: inline-flex; align-items: center; gap: 12px;
-    background: #f97316; color: #fff; font-size: 36px; font-weight: 900;
-    padding: 16px 50px; border-radius: 16px; margin-top: 50px;
-    align-self: center; box-shadow: 0 0 40px rgba(249, 115, 22, 0.3);
+    background: #f97316; color: #fff; font-size: 34px; font-weight: 900;
+    padding: 16px 50px; border-radius: 16px; margin-top: 40px; align-self: center;
+    box-shadow: 0 0 40px rgba(249,115,22,0.3);
   }
 
-  /* SLIDE 4: COMPARISON */
-  .s4 {
-    background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-    gap: 40px;
+  /* SLIDE 4: VS — Split screen */
+  .s4 { background: linear-gradient(180deg, #1f2937 0%, #111827 100%); }
+  .s4 .split {
+    display: flex; width: 100%; height: 100%;
   }
-  .s4 h2 { font-size: 56px; font-weight: 900; margin-bottom: 20px; }
-  .s4 h2 span { color: #fbbf24; }
-  .s4 .vs-container {
-    display: flex;
-    gap: 30px;
-    width: 100%;
+  .s4 .half {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 60px 40px; position: relative;
   }
-  .s4 .vs-card {
-    flex: 1;
-    border-radius: 24px;
-    padding: 40px 30px;
-    text-align: center;
+  .s4 .half-easy {
+    background: url('https://images.unsplash.com/photo-1528495612343-9ca9f4a4de28?w=540&q=80') center/cover;
   }
-  .s4 .vs-easy {
-    background: rgba(16, 185, 129, 0.1);
-    border: 2px solid rgba(16, 185, 129, 0.3);
+  .s4 .half-bold {
+    background: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=540&q=80') center/cover;
   }
-  .s4 .vs-bold {
-    background: rgba(249, 115, 22, 0.1);
-    border: 2px solid rgba(249, 115, 22, 0.3);
+  .s4 .half::before {
+    content: ''; position: absolute; inset: 0;
   }
-  .s4 .vs-card h3 {
-    font-size: 36px; font-weight: 800; margin-bottom: 16px;
-  }
-  .s4 .vs-easy h3 { color: #10b981; }
-  .s4 .vs-bold h3 { color: #f97316; }
-  .s4 .vs-card p {
-    font-size: 26px; color: #9ca3af; line-height: 1.4;
-  }
-  .s4 .vs-divider {
+  .s4 .half-easy::before { background: rgba(16,185,129,0.7); }
+  .s4 .half-bold::before { background: rgba(249,115,22,0.7); }
+  .s4 .half * { position: relative; z-index: 1; }
+  .s4 .half h3 { font-size: 56px; font-weight: 900; margin-bottom: 20px; }
+  .s4 .half p { font-size: 30px; line-height: 1.5; color: rgba(255,255,255,0.9); }
+  .s4 .vs-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;
+    width: 100px; height: 100px; border-radius: 50%; background: #fbbf24;
     display: flex; align-items: center; justify-content: center;
-    font-size: 40px; font-weight: 900; color: #fbbf24;
-    width: 80px; flex-shrink: 0;
-  }
-  .s4 .bottom-text {
-    font-size: 36px; font-weight: 700; color: #fbbf24; margin-top: 20px;
+    font-size: 36px; font-weight: 900; color: #111827;
+    box-shadow: 0 0 40px rgba(251,191,36,0.5);
   }
 
-  /* SLIDE 5: CTA */
-  .s5 { background: linear-gradient(160deg, #1e1b4b 0%, #1f2937 50%, #0f2920 100%); }
-  .s5 .logo { font-size: 90px; font-weight: 900; color: #fbbf24; margin-bottom: 40px; }
-  .s5 h2 { font-size: 54px; font-weight: 800; line-height: 1.3; max-width: 800px; margin-bottom: 60px; }
+  /* SLIDE 5: CTA — Bar scene */
+  .s5 .bg { background-image: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=1080&q=80'); }
+  .s5 .overlay { background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(30,27,75,0.7) 50%, rgba(0,0,0,0.9) 100%); }
+  .s5 .logo { font-size: 90px; font-weight: 900; color: #fbbf24; margin-bottom: 40px; text-shadow: 0 0 80px rgba(251,191,36,0.4); }
+  .s5 h2 { font-size: 52px; font-weight: 800; line-height: 1.3; max-width: 800px; margin-bottom: 60px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
   .s5 .btn {
     background: #fbbf24; color: #111827; font-size: 36px; font-weight: 800;
-    padding: 28px 80px; border-radius: 20px;
-    box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+    padding: 28px 80px; border-radius: 20px; box-shadow: 0 0 60px rgba(251,191,36,0.4);
   }
 </style>
 </head>
 <body>
 
 <div class="slide s1">
-  <div class="emoji">🔥</div>
-  <h1>Every task has <span>two versions</span></h1>
-  <p>Do you play it safe... or go <span style="color:#f97316;font-weight:700;">BOLD</span>?</p>
+  <div class="bg"></div><div class="overlay"></div>
+  <div class="content">
+    <div class="emoji">🔥</div>
+    <h1>Every task has <span class="orange">two versions</span></h1>
+    <p>Do you play it safe... or go BOLD?</p>
+  </div>
 </div>
 
 <div class="slide s2">
-  <div class="label">✅ Easy Mode</div>
-  <div class="card">
-    <h2>Stranger Selfie</h2>
-    <p>Take a selfie with someone you don't know</p>
-    <div class="points">+1 point • Standard badge progress</div>
+  <div class="bg"></div><div class="overlay"></div>
+  <div class="content">
+    <div class="label">✅ Easy Mode</div>
+    <div class="card">
+      <h2>Stranger Selfie</h2>
+      <p>Take a selfie with someone you don't know</p>
+      <div class="points">+1 point  ·  Standard badge progress</div>
+    </div>
+    <div class="photo-strip">
+      <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="friends selfie">
+      <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=300&q=80" alt="party">
+      <img src="https://images.unsplash.com/photo-1506869640319-fe1a24fd76cb?w=300&q=80" alt="group">
+    </div>
+    <div class="badge-pill">🛡️ Safe & Fun</div>
   </div>
-  <div class="badge">🛡️ Safe & Fun</div>
 </div>
 
 <div class="slide s3">
-  <div class="fire">🔥🔥🔥</div>
-  <div class="label">Bold Mode</div>
-  <div class="card">
-    <h2>Stranger Selfie</h2>
-    <p>Take a selfie with <strong>THREE</strong> people you don't know</p>
-    <div class="points">+2 points • 2x badge progress</div>
+  <div class="bg"></div><div class="overlay"></div>
+  <div class="content">
+    <div class="fire">🔥🔥🔥</div>
+    <div class="label">Bold Mode</div>
+    <div class="card">
+      <h2>Stranger Selfie</h2>
+      <p>Take a selfie with <strong>THREE</strong> people you don't know</p>
+      <div class="points">+2 points  ·  2x badge progress</div>
+    </div>
+    <div class="multiplier">⚡ 2X POINTS</div>
   </div>
-  <div class="multiplier">⚡ 2X POINTS</div>
 </div>
 
 <div class="slide s4">
-  <h2>The <span>choice</span> is yours</h2>
-  <div class="vs-container">
-    <div class="vs-card vs-easy">
+  <div class="split">
+    <div class="half half-easy">
       <h3>Easy</h3>
       <p>Chill vibes<br>Standard points<br>No pressure</p>
     </div>
-    <div class="vs-divider">VS</div>
-    <div class="vs-card vs-bold">
+    <div class="vs-badge">VS</div>
+    <div class="half half-bold">
       <h3>Bold</h3>
-      <p>Maximum chaos<br>Double points<br>Legendary status</p>
+      <p>Maximum chaos<br>Double points<br>Legend status</p>
     </div>
   </div>
-  <div class="bottom-text">Every round. Every player. Every time.</div>
 </div>
 
 <div class="slide s5">
-  <div class="logo">SpyShot</div>
-  <h2>How bold are you willing to go?</h2>
-  <div class="btn">Download Free</div>
+  <div class="bg"></div><div class="overlay"></div>
+  <div class="content">
+    <div class="logo">SpyShot</div>
+    <h2>How bold are you willing to go?</h2>
+    <div class="btn">Download Free</div>
+  </div>
 </div>
 
 </body>
