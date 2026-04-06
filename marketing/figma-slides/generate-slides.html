@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SpyShot Figma Slide Generator</title>
+<style>
+  body { font-family: system-ui; background: #1a1a2e; color: #fff; padding: 40px; }
+  h1 { color: #fbbf24; margin-bottom: 8px; }
+  p { color: #9ca3af; margin-bottom: 30px; }
+  .controls { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+  button {
+    background: #fbbf24; color: #111; border: none; padding: 12px 24px;
+    border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px;
+  }
+  button:hover { background: #f59e0b; }
+  button.secondary { background: #374151; color: #fff; }
+  .status { color: #10b981; margin-top: 12px; font-size: 14px; }
+  canvas { display: none; }
+</style>
+</head>
+<body>
+<h1>SpyShot Slide Exporter</h1>
+<p>Generates PNG slides at 1080x1920 (TikTok resolution). Download individually or all at once, then drag into Figma.</p>
+
+<div class="controls">
+  <button onclick="downloadAll()">Download All Slides (ZIP-like)</button>
+  <button class="secondary" onclick="downloadSlideshow(1)">Slideshow 1: What is SpyShot</button>
+  <button class="secondary" onclick="downloadSlideshow(2)">Slideshow 2: Bold or Easy</button>
+  <button class="secondary" onclick="downloadSlideshow(3)">Slideshow 3: Pick Your Vibe</button>
+</div>
+<div class="status" id="status"></div>
+
+<canvas id="canvas" width="1080" height="1920"></canvas>
+
+<script>
+const W = 1080, H = 1920;
+const COLORS = {
+  bg: '#1f2937', surface: '#374151', border: '#4b5563',
+  text: '#f9fafb', muted: '#9ca3af', secondary: '#d1d5db',
+  primary: '#fbbf24', primaryDark: '#f59e0b',
+  orange: '#f97316', pink: '#ec4899', blue: '#3b82f6',
+  green: '#10b981', purple: '#a855f7',
+  error: '#ef4444', dark: '#111827',
+};
+
+function getCtx() {
+  const c = document.getElementById('canvas');
+  c.width = W; c.height = H;
+  return c.getContext('2d');
+}
+
+function bg(ctx, gradient) {
+  const g = ctx.createLinearGradient(0, 0, W * 0.4, H);
+  gradient.forEach(([stop, color]) => g.addColorStop(stop, color));
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function glow(ctx, x, y, r, color) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, color);
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r, y - r, r * 2, r * 2);
+}
+
+function text(ctx, str, x, y, { size = 40, weight = '700', color = COLORS.text, align = 'center', maxWidth = W - 160, lineHeight = 1.2 } = {}) {
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px Inter, system-ui, sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'top';
+
+  const words = str.split(' ');
+  let line = '';
+  let cy = y;
+  for (const word of words) {
+    const test = line + word + ' ';
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line.trim(), x, cy);
+      line = word + ' ';
+      cy += size * lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line.trim(), x, cy);
+  return cy + size * lineHeight;
+}
+
+function pill(ctx, str, x, y, bgColor, textColor, { size = 28, px = 36, py = 14 } = {}) {
+  ctx.font = `700 ${size}px Inter, system-ui, sans-serif`;
+  const w = ctx.measureText(str).width + px * 2;
+  const h = size + py * 2;
+  ctx.fillStyle = bgColor;
+  ctx.beginPath();
+  ctx.roundRect(x - w/2, y, w, h, h/2);
+  ctx.fill();
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(str, x, y + h/2);
+}
+
+function card(ctx, x, y, w, h, { bg = 'rgba(255,255,255,0.06)', border = 'rgba(255,255,255,0.1)', radius = 24 } = {}) {
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, radius);
+  ctx.fill();
+  if (border) {
+    ctx.strokeStyle = border;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+function photoPlaceholder(ctx, x, y, w, h, label, borderColor = COLORS.border) {
+  ctx.fillStyle = COLORS.surface;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 16);
+  ctx.fill();
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Label
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = '500 18px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('📷 ' + label, x + w/2, y + h/2);
+}
+
+function slideNum(ctx, current, total) {
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.font = '600 22px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`SLIDE ${current} OF ${total}`, W/2, H - 60);
+}
+
+// ===== SLIDESHOW 1: WHAT IS SPYSHOT =====
+const slides1 = [
+  function(ctx) { // Hook
+    bg(ctx, [[0, '#0f172a'], [0.5, '#1f2937'], [1, '#1e1b4b']]);
+    glow(ctx, W * 0.8, 200, 400, 'rgba(251,191,36,0.12)');
+    glow(ctx, 200, H * 0.8, 350, 'rgba(168,85,247,0.08)');
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Friends group selfie outdoor', COLORS.primary);
+    // Overlay
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.65)');
+    ov.addColorStop(0.4, 'rgba(0,0,0,0.4)');
+    ov.addColorStop(1, 'rgba(0,0,0,0.75)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    text(ctx, 'YOUR PARTIES ARE ABOUT TO CHANGE', W/2, 680, { size: 30, weight: '600', color: COLORS.primary });
+    text(ctx, 'The app that turns any night out into a legendary story', W/2, 780, { size: 72, weight: '900' });
+    text(ctx, 'SWIPE →', W/2, H - 100, { size: 26, color: 'rgba(255,255,255,0.4)' });
+    slideNum(ctx, 1, 6);
+  },
+  function(ctx) { // Problem
+    bg(ctx, [[0, '#0f172a'], [1, '#111827']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: People bored on phones at gathering', COLORS.error);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(15,23,42,0.88)');
+    ov.addColorStop(1, 'rgba(15,23,42,0.95)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    text(ctx, "We've all been there...", W/2, 180, { size: 58, weight: '800' });
+    const problems = [
+      "Everyone's on their phone at the party",
+      'Same boring conversations every weekend',
+      'No one wants to suggest a drinking game',
+      'The night has zero memorable moments',
+      'Nothing to look back on the next day',
+    ];
+    let py = 340;
+    problems.forEach(p => {
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(80, py + 60, W - 160, 1);
+      text(ctx, '✕', 120, py, { size: 36, color: COLORS.error, align: 'left', weight: '800' });
+      text(ctx, p, 180, py, { size: 32, color: COLORS.secondary, align: 'left', maxWidth: W - 280 });
+      py += 80;
+    });
+    slideNum(ctx, 2, 6);
+  },
+  function(ctx) { // Solution
+    bg(ctx, [[0, '#1e1b4b'], [0.5, '#1f2937'], [1, '#0f2920']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Group of friends party outdoor', COLORS.green);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(15,23,42,0.92)');
+    ov.addColorStop(0.5, 'rgba(30,27,75,0.88)');
+    ov.addColorStop(1, 'rgba(15,23,42,0.95)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    glow(ctx, W/2, H/2, 500, 'rgba(251,191,36,0.06)');
+    text(ctx, 'SpyShot', W/2, 240, { size: 88, weight: '900', color: COLORS.primary });
+    text(ctx, 'The party game that plays itself', W/2, 360, { size: 36, weight: '600' });
+    const features = [
+      ['🎯', 'Random Challenges', '120+ tasks from chill to extreme'],
+      ['📸', 'Photo Proof', 'Capture every legendary moment'],
+      ['🏆', 'Badges & Tiers', 'Bronze to Mythic — flex your rank'],
+      ['🔥', 'Bold Mode', 'Risk it for 2x points'],
+      ['👥', 'Social Feed', 'Relive the night with friends'],
+    ];
+    let fy = 500;
+    features.forEach(([icon, title, desc]) => {
+      card(ctx, 80, fy, W - 160, 100, { bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.1)' });
+      text(ctx, icon, 140, fy + 26, { size: 40, align: 'left' });
+      text(ctx, title, 200, fy + 22, { size: 28, weight: '700', align: 'left', maxWidth: 600 });
+      text(ctx, desc, 200, fy + 58, { size: 20, color: COLORS.muted, align: 'left', maxWidth: 600 });
+      fy += 120;
+    });
+    slideNum(ctx, 3, 6);
+  },
+  function(ctx) { // How it works
+    bg(ctx, [[0, '#0f172a'], [1, '#111827']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Friends at outdoor dinner', COLORS.blue);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(15,23,42,0.93)');
+    ov.addColorStop(1, 'rgba(15,23,42,0.9)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    text(ctx, 'How SpyShot works', W/2, 140, { size: 52, weight: '800' });
+    const steps = [
+      ['Create a group', 'Invite friends or share a 4-digit room code'],
+      ['Pick your vibe', 'Chill, Wild, or Extreme — you set the intensity'],
+      ['The app picks who & what', 'Random player + challenge. Easy or Bold — your choice'],
+      ['Complete & prove it', 'Snap a photo, beat the timer, earn badges'],
+      ['Relive the night', 'Feed, reactions, leaderboard — see it all the next day'],
+    ];
+    let sy = 300;
+    steps.forEach(([title, desc], i) => {
+      // Number circle
+      ctx.fillStyle = COLORS.primary;
+      ctx.beginPath();
+      ctx.arc(140, sy + 30, 34, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = COLORS.dark;
+      ctx.font = '900 30px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(i + 1), 140, sy + 30);
+      text(ctx, title, 210, sy, { size: 32, weight: '700', align: 'left', maxWidth: 700 });
+      text(ctx, desc, 210, sy + 42, { size: 23, color: COLORS.muted, align: 'left', maxWidth: 700 });
+      sy += 120;
+    });
+    slideNum(ctx, 4, 6);
+  },
+  function(ctx) { // Social proof
+    bg(ctx, [[0, '#0f2920'], [0.5, '#1f2937'], [1, '#1e1b4b']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Friends laughing at outdoor party', COLORS.green);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.7)');
+    ov.addColorStop(0.4, 'rgba(0,0,0,0.55)');
+    ov.addColorStop(1, 'rgba(0,0,0,0.8)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    text(ctx, '"', W/2, 350, { size: 160, color: COLORS.primary });
+    text(ctx, 'We used SpyShot at our house party and it was genuinely the most fun we\'ve had in months. Everyone was crying laughing.', W/2, 560, { size: 40, weight: '600' });
+    text(ctx, '— @emma_w', W/2, 900, { size: 28, color: COLORS.primary, weight: '700' });
+    text(ctx, 'Gold tier badge holder', W/2, 945, { size: 22, color: 'rgba(255,255,255,0.4)' });
+    // Stats
+    const stats = [['120+', 'Challenges'], ['3', 'Intensities'], ['9', 'Badge Tiers']];
+    stats.forEach(([num, label], i) => {
+      const sx = 200 + i * 280;
+      text(ctx, num, sx, 1120, { size: 50, weight: '900', color: COLORS.primary });
+      text(ctx, label, sx, 1185, { size: 20, color: 'rgba(255,255,255,0.5)' });
+    });
+    slideNum(ctx, 5, 6);
+  },
+  function(ctx) { // CTA
+    bg(ctx, [[0, '#0f172a'], [0.5, '#1e1b4b'], [1, '#111827']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Beer cheers outdoor close-up', COLORS.primary);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.8)');
+    ov.addColorStop(0.5, 'rgba(30,27,75,0.65)');
+    ov.addColorStop(1, 'rgba(0,0,0,0.9)');
+    ctx.fillStyle = ov;
+    ctx.fillRect(0, 0, W, H);
+    glow(ctx, W/2, H/2, 500, 'rgba(251,191,36,0.08)');
+    text(ctx, 'SpyShot', W/2, 600, { size: 100, weight: '900', color: COLORS.primary });
+    text(ctx, 'Your next night out deserves to be legendary', W/2, 760, { size: 48, weight: '800' });
+    pill(ctx, 'Download Free', W/2, 1020, COLORS.primary, COLORS.dark, { size: 34, px: 60, py: 22 });
+    text(ctx, 'Available on iOS & Android', W/2, 1120, { size: 24, color: 'rgba(255,255,255,0.4)' });
+    slideNum(ctx, 6, 6);
+  },
+];
+
+// ===== SLIDESHOW 2: BOLD OR EASY =====
+const slides2 = [
+  function(ctx) {
+    bg(ctx, [[0, '#1f2937'], [1, '#0f172a']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Friends cheersing beers outdoors', COLORS.orange);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.65)'); ov.addColorStop(1, 'rgba(0,0,0,0.75)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '🔥', W/2, 600, { size: 100 });
+    text(ctx, 'Every task has two versions', W/2, 760, { size: 68, weight: '900' });
+    text(ctx, 'Do you play it safe... or go BOLD?', W/2, 1020, { size: 30, color: 'rgba(255,255,255,0.55)' });
+    slideNum(ctx, 1, 5);
+  },
+  function(ctx) { // Easy
+    bg(ctx, [[0, '#0f2920'], [1, '#1f2937']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Relaxed outdoor hangout', COLORS.green);
+    const ov = ctx.createLinearGradient(0, 0, 0, H); ov.addColorStop(0, 'rgba(15,41,32,0.93)'); ov.addColorStop(1, 'rgba(31,41,55,0.96)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '✅ EASY MODE', W/2, 300, { size: 28, weight: '700', color: COLORS.green });
+    card(ctx, 80, 400, W-160, 320, { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' });
+    text(ctx, 'Stranger Selfie', 130, 440, { size: 44, weight: '800', align: 'left' });
+    text(ctx, 'Take a selfie with someone you don\'t know', 130, 510, { size: 30, color: COLORS.secondary, align: 'left', maxWidth: 780 });
+    text(ctx, '+1 point  ·  Standard badge progress', 130, 610, { size: 24, color: COLORS.green, align: 'left', weight: '700' });
+    // Photo placeholders
+    for (let i = 0; i < 3; i++) {
+      photoPlaceholder(ctx, 120 + i * 290, 800, 260, 260, 'Photo ' + (i+1), COLORS.green);
+    }
+    pill(ctx, '🛡️ Safe & Fun', W/2, 1140, COLORS.green, '#fff', { size: 28 });
+    slideNum(ctx, 2, 5);
+  },
+  function(ctx) { // Bold
+    bg(ctx, [[0, '#2d1810'], [1, '#1f2937']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Energetic outdoor party', COLORS.orange);
+    const ov = ctx.createLinearGradient(0, 0, 0, H); ov.addColorStop(0, 'rgba(45,24,16,0.92)'); ov.addColorStop(1, 'rgba(31,41,55,0.96)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '🔥🔥🔥', W/2, 280, { size: 70 });
+    text(ctx, 'BOLD MODE', W/2, 400, { size: 28, weight: '700', color: COLORS.orange });
+    card(ctx, 80, 500, W-160, 320, { bg: 'rgba(249,115,22,0.1)', border: 'rgba(249,115,22,0.3)' });
+    text(ctx, 'Stranger Selfie', 130, 540, { size: 44, weight: '800', align: 'left' });
+    text(ctx, 'Take a selfie with THREE people you don\'t know', 130, 610, { size: 30, color: COLORS.secondary, align: 'left', maxWidth: 780 });
+    text(ctx, '+2 points  ·  2x badge progress', 130, 710, { size: 24, color: COLORS.orange, align: 'left', weight: '700' });
+    pill(ctx, '⚡ 2X POINTS', W/2, 920, COLORS.orange, '#fff', { size: 32, px: 50, py: 16 });
+    slideNum(ctx, 3, 5);
+  },
+  function(ctx) { // VS
+    // Left half
+    ctx.fillStyle = COLORS.green;
+    ctx.fillRect(0, 0, W/2, H);
+    photoPlaceholder(ctx, 0, 0, W/2, H, 'PHOTO: Chill hangout', COLORS.green);
+    ctx.fillStyle = 'rgba(16,185,129,0.7)';
+    ctx.fillRect(0, 0, W/2, H);
+    text(ctx, 'Easy', W/4, 780, { size: 56, weight: '900' });
+    text(ctx, 'Chill vibes\nStandard points\nNo pressure', W/4, 870, { size: 28, color: 'rgba(255,255,255,0.9)' });
+    // Right half
+    ctx.fillStyle = COLORS.orange;
+    ctx.fillRect(W/2, 0, W/2, H);
+    photoPlaceholder(ctx, W/2, 0, W/2, H, 'PHOTO: Wild party', COLORS.orange);
+    ctx.fillStyle = 'rgba(249,115,22,0.7)';
+    ctx.fillRect(W/2, 0, W/2, H);
+    text(ctx, 'Bold', W*3/4, 780, { size: 56, weight: '900' });
+    text(ctx, 'Maximum chaos\nDouble points\nLegend status', W*3/4, 870, { size: 28, color: 'rgba(255,255,255,0.9)' });
+    // VS badge
+    ctx.fillStyle = COLORS.primary;
+    ctx.beginPath(); ctx.arc(W/2, H/2, 50, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = COLORS.dark;
+    ctx.font = '900 34px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('VS', W/2, H/2);
+    slideNum(ctx, 4, 5);
+  },
+  function(ctx) { // CTA
+    bg(ctx, [[0, '#1e1b4b'], [0.5, '#1f2937'], [1, '#0f2920']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Beer cheers outdoor', COLORS.primary);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.75)'); ov.addColorStop(1, 'rgba(0,0,0,0.9)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, 'SpyShot', W/2, 680, { size: 90, weight: '900', color: COLORS.primary });
+    text(ctx, 'How bold are you willing to go?', W/2, 820, { size: 50, weight: '800' });
+    pill(ctx, 'Download Free', W/2, 1000, COLORS.primary, COLORS.dark, { size: 34, px: 60, py: 22 });
+    slideNum(ctx, 5, 5);
+  },
+];
+
+// ===== SLIDESHOW 3: PICK YOUR VIBE =====
+const slides3 = [
+  function(ctx) {
+    bg(ctx, [[0, '#1f2937'], [1, '#0f172a']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Group outdoor with drinks', COLORS.primary);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.7)'); ov.addColorStop(1, 'rgba(15,23,42,0.85)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '😎  🔥  💀', W/2, 620, { size: 70 });
+    text(ctx, 'Not every night is the same vibe', W/2, 780, { size: 64, weight: '900' });
+    text(ctx, "That's why SpyShot has 3 intensity modes", W/2, 1020, { size: 28, color: 'rgba(255,255,255,0.45)' });
+    slideNum(ctx, 1, 5);
+  },
+  function(ctx) { // Chill
+    bg(ctx, [[0, '#0c1b2f'], [1, '#1f2937']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Relaxed hangout with beers', COLORS.blue);
+    const ov = ctx.createLinearGradient(0, 0, 0, H); ov.addColorStop(0, 'rgba(12,27,47,0.93)'); ov.addColorStop(1, 'rgba(31,41,55,0.96)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '😎', W/2, 200, { size: 90 });
+    text(ctx, 'CHILL', W/2, 320, { size: 66, weight: '900', color: COLORS.blue });
+    text(ctx, 'Icebreakers & light fun', W/2, 410, { size: 30, color: '#93c5fd' });
+    const tasks = ['🎤 Sing the first line of your last song', '📱 Show your 7th camera roll photo', '🤝 Compliment everyone at the table', '🎭 Celebrity impression contest', '💬 Two truths and one lie'];
+    let ty = 520;
+    tasks.forEach(t => {
+      card(ctx, 80, ty, W-160, 70, { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' });
+      text(ctx, t, 120, ty + 18, { size: 25, align: 'left', maxWidth: 800, color: '#e5e7eb' });
+      ty += 90;
+    });
+    // Photo placeholders
+    for (let i = 0; i < 3; i++) {
+      photoPlaceholder(ctx, 120 + i * 290, ty + 20, 260, 200, 'Photo', COLORS.blue);
+    }
+    slideNum(ctx, 2, 5);
+  },
+  function(ctx) { // Wild
+    bg(ctx, [[0, '#2d1810'], [1, '#1f2937']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Festival/outdoor party', COLORS.orange);
+    const ov = ctx.createLinearGradient(0, 0, 0, H); ov.addColorStop(0, 'rgba(45,24,16,0.92)'); ov.addColorStop(1, 'rgba(31,41,55,0.96)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '🔥', W/2, 200, { size: 90 });
+    text(ctx, 'WILD', W/2, 320, { size: 66, weight: '900', color: COLORS.orange });
+    text(ctx, 'Classic party mode', W/2, 410, { size: 30, color: '#fdba74' });
+    const tasks = ['💃 Challenge someone to a dance-off', '💍 Fake propose to a stranger', '🎸 30-second air guitar solo', '📸 Photobomb as many photos as possible', '🎵 Request a song — if it plays, everyone drinks'];
+    let ty = 520;
+    tasks.forEach(t => {
+      card(ctx, 80, ty, W-160, 70, { bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)' });
+      text(ctx, t, 120, ty + 18, { size: 25, align: 'left', maxWidth: 800, color: '#e5e7eb' });
+      ty += 90;
+    });
+    slideNum(ctx, 3, 5);
+  },
+  function(ctx) { // Extreme
+    bg(ctx, [[0, '#2d0a1e'], [1, '#1f2937']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Intense crowd energy', COLORS.pink);
+    const ov = ctx.createLinearGradient(0, 0, 0, H); ov.addColorStop(0, 'rgba(45,10,30,0.9)'); ov.addColorStop(1, 'rgba(31,41,55,0.96)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, '💀', W/2, 200, { size: 90 });
+    text(ctx, 'EXTREME', W/2, 320, { size: 66, weight: '900', color: COLORS.pink });
+    text(ctx, 'Late night chaos', W/2, 410, { size: 30, color: '#f9a8d4' });
+    const tasks = ['🎤 Sing a duet with a complete stranger', '🏄 Get 3 people to crowd surf you', '🍋 Eat a lemon without making a face', '🎙️ Give a speech standing on a chair', '🔥 Full roast battle — group votes winner'];
+    let ty = 520;
+    tasks.forEach(t => {
+      card(ctx, 80, ty, W-160, 70, { bg: 'rgba(236,72,153,0.08)', border: 'rgba(236,72,153,0.2)' });
+      text(ctx, t, 120, ty + 18, { size: 25, align: 'left', maxWidth: 800, color: '#e5e7eb' });
+      ty += 90;
+    });
+    text(ctx, '* Not for the faint of heart', W/2, ty + 40, { size: 24, color: COLORS.pink, weight: '600' });
+    slideNum(ctx, 4, 5);
+  },
+  function(ctx) { // CTA
+    bg(ctx, [[0, '#1f2937'], [1, '#111827']]);
+    photoPlaceholder(ctx, 0, 0, W, H, 'BACKGROUND: Beers outdoor close-up', COLORS.primary);
+    const ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.8)'); ov.addColorStop(1, 'rgba(0,0,0,0.9)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+    text(ctx, 'SpyShot', W/2, 620, { size: 80, weight: '900', color: COLORS.primary });
+    text(ctx, 'Pick your vibe. Start the game.', W/2, 750, { size: 48, weight: '800' });
+    // Mode pills
+    pill(ctx, 'Chill', W/2 - 220, 900, 'rgba(59,130,246,0.2)', COLORS.blue, { size: 26 });
+    pill(ctx, 'Wild', W/2, 900, 'rgba(249,115,22,0.2)', COLORS.orange, { size: 26 });
+    pill(ctx, 'Extreme', W/2 + 220, 900, 'rgba(236,72,153,0.2)', COLORS.pink, { size: 26 });
+    pill(ctx, 'Download Free', W/2, 1040, COLORS.primary, COLORS.dark, { size: 34, px: 60, py: 22 });
+    slideNum(ctx, 5, 5);
+  },
+];
+
+const allSlideshows = { 1: slides1, 2: slides2, 3: slides3 };
+
+function renderSlide(slideFn) {
+  const ctx = getCtx();
+  slideFn(ctx);
+  return document.getElementById('canvas').toDataURL('image/png');
+}
+
+function downloadImage(dataUrl, filename) {
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = filename;
+  a.click();
+}
+
+async function downloadSlideshow(num) {
+  const slides = allSlideshows[num];
+  const names = { 1: 'what-is-spyshot', 2: 'bold-or-easy', 3: 'pick-your-vibe' };
+  document.getElementById('status').textContent = `Generating slideshow ${num}...`;
+  for (let i = 0; i < slides.length; i++) {
+    const url = renderSlide(slides[i]);
+    downloadImage(url, `${names[num]}-slide-${i + 1}.png`);
+    await new Promise(r => setTimeout(r, 500));
+  }
+  document.getElementById('status').textContent = `Done! ${slides.length} slides downloaded.`;
+}
+
+async function downloadAll() {
+  for (const num of [1, 2, 3]) {
+    await downloadSlideshow(num);
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  document.getElementById('status').textContent = 'All 16 slides downloaded!';
+}
+</script>
+</body>
+</html>
