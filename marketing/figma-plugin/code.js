@@ -4,7 +4,7 @@
 const W = 1080;
 const H = 1920;
 
-const C = {
+var C = {
   bg: { r: 0.122, g: 0.161, b: 0.216 },       // #1f2937
   dark: { r: 0.067, g: 0.094, b: 0.153 },      // #111827
   surface: { r: 0.216, g: 0.255, b: 0.318 },    // #374151
@@ -17,8 +17,16 @@ const C = {
   purple: { r: 0.659, g: 0.333, b: 0.969 },     // #a855f7
   error: { r: 0.937, g: 0.267, b: 0.267 },      // #ef4444
   white: { r: 1, g: 1, b: 1 },
-  textMuted: { r: 0.612, g: 0.639, b: 0.686 },  // #9ca3af
-  textSec: { r: 0.820, g: 0.835, b: 0.855 },    // #d1d5db
+  textMuted: { r: 0.75, g: 0.76, b: 0.8 },      // lighter for vibrant bgs
+  textSec: { r: 0.9, g: 0.91, b: 0.93 },
+  // Deep vibrant backgrounds
+  deepPurple: { r: 0.18, g: 0.05, b: 0.35 },   // #2e0d59
+  deepBlue: { r: 0.05, g: 0.1, b: 0.35 },      // #0d1a59
+  deepPink: { r: 0.35, g: 0.05, b: 0.2 },      // #590d33
+  deepOrange: { r: 0.35, g: 0.15, b: 0.05 },   // #59260d
+  deepGreen: { r: 0.05, g: 0.25, b: 0.18 },    // #0d402e
+  midPurple: { r: 0.3, g: 0.1, b: 0.5 },       // #4d1a80
+  midPink: { r: 0.5, g: 0.1, b: 0.35 },        // #801a59
 };
 
 // Figma solid fills: color = {r,g,b}, opacity is separate.
@@ -212,9 +220,9 @@ function slideLabel(parent, current, total) {
 // ===================================================================
 
 function slide1_hook(frame) {
-  addGradientBg(frame, [[0, C.dark], [0.5, C.bg], [1, { r: 0.118, g: 0.106, b: 0.302 }]]);
+  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.midPink], [1, C.deepOrange]]);
   addPhotoPlaceholder(frame, 'Friends group selfie outdoor with beers', 0, W, H, C.primary);
-  addOverlay(frame, 0.65);
+  addOverlay(frame, 0.45);
   addText(frame, 'YOUR PARTIES ARE ABOUT TO CHANGE', { y: 680, size: 30, weight: 'Semi Bold', color: C.primary });
   addText(frame, 'The app that turns any night out into a legendary story', { y: 760, size: 72, weight: 'Black' });
   addText(frame, 'SWIPE →', { y: H - 110, size: 26, color: rgba(C.white, 0.4) });
@@ -222,9 +230,9 @@ function slide1_hook(frame) {
 }
 
 function slide1_problem(frame) {
-  addGradientBg(frame, [[0, C.dark], [1, { r: 0.059, g: 0.090, b: 0.165 }]]);
+  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepBlue]]);
   addPhotoPlaceholder(frame, 'People bored on phones at party/gathering', 0, W, H, C.error);
-  addOverlay(frame, 0.88);
+  addOverlay(frame, 0.55);
   addText(frame, "We've all been there...", { y: 180, size: 58, weight: 'Extra Bold' });
   const problems = [
     "Everyone's on their phone at the party",
@@ -243,9 +251,9 @@ function slide1_problem(frame) {
 }
 
 function slide1_solution(frame) {
-  addGradientBg(frame, [[0, { r: 0.118, g: 0.106, b: 0.302 }], [0.5, C.bg], [1, { r: 0.059, g: 0.161, b: 0.125 }]]);
+  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPurple], [1, C.deepGreen]]);
   addPhotoPlaceholder(frame, 'Group of friends having fun at outdoor party', 0, W, H, C.green);
-  addOverlay(frame, 0.9);
+  addOverlay(frame, 0.5);
   addText(frame, 'SpyShot', { y: 240, size: 88, weight: 'Black', color: C.primary });
   addText(frame, 'The party game that plays itself', { y: 360, size: 36, weight: 'Semi Bold' });
   const features = [
@@ -267,9 +275,9 @@ function slide1_solution(frame) {
 }
 
 function slide1_howItWorks(frame) {
-  addGradientBg(frame, [[0, C.dark], [1, { r: 0.059, g: 0.090, b: 0.165 }]]);
+  addGradientBg(frame, [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.midPurple]]);
   addPhotoPlaceholder(frame, 'Friends at outdoor dinner/gathering', 0, W, H, C.blue);
-  addOverlay(frame, 0.92);
+  addOverlay(frame, 0.5);
   addText(frame, 'How SpyShot works', { y: 140, size: 52, weight: 'Extra Bold' });
   const steps = [
     ['Create a group', 'Invite friends or share a 4-digit room code'],
@@ -290,9 +298,9 @@ function slide1_howItWorks(frame) {
 }
 
 function slide1_socialProof(frame) {
-  addGradientBg(frame, [[0, { r: 0.059, g: 0.161, b: 0.125 }], [0.5, C.bg], [1, { r: 0.118, g: 0.106, b: 0.302 }]]);
+  addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepPurple], [1, C.deepPink]]);
   addPhotoPlaceholder(frame, 'Friends laughing at outdoor party/BBQ', 0, W, H, C.green);
-  addOverlay(frame, 0.7);
+  addOverlay(frame, 0.4);
   addText(frame, '"', { y: 380, size: 140, weight: 'Black', color: C.primary });
   addText(frame, "We used SpyShot at our house party and it was genuinely the most fun we've had in months. Everyone was crying laughing.", { y: 560, size: 40, weight: 'Semi Bold' });
   addText(frame, '— @emma_w', { y: 900, size: 28, weight: 'Bold', color: C.primary });
@@ -307,9 +315,9 @@ function slide1_socialProof(frame) {
 }
 
 function slide1_cta(frame) {
-  addGradientBg(frame, [[0, C.dark], [0.5, { r: 0.118, g: 0.106, b: 0.302 }], [1, C.dark]]);
+  addGradientBg(frame, [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]);
   addPhotoPlaceholder(frame, 'Beer cheers outdoor close-up', 0, W, H, C.primary);
-  addOverlay(frame, 0.8);
+  addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 600, size: 100, weight: 'Black', color: C.primary });
   addText(frame, 'Your next night out deserves to be legendary', { y: 750, size: 48, weight: 'Extra Bold' });
   addPill(frame, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 34);
@@ -319,9 +327,9 @@ function slide1_cta(frame) {
 
 // SLIDESHOW 2
 function slide2_hook(frame) {
-  addGradientBg(frame, [[0, C.bg], [1, C.dark]]);
+  addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPurple], [1, C.deepPink]]);
   addPhotoPlaceholder(frame, 'Friends cheersing beers at outdoor gathering', 0, W, H, C.orange);
-  addOverlay(frame, 0.65);
+  addOverlay(frame, 0.4);
   addText(frame, '🔥', { y: 620, size: 100 });
   addText(frame, 'Every task has two versions', { y: 760, size: 66, weight: 'Black' });
   addText(frame, 'Do you play it safe... or go BOLD?', { y: 1020, size: 30, color: rgba(C.white, 0.55) });
@@ -329,9 +337,9 @@ function slide2_hook(frame) {
 }
 
 function slide2_easy(frame) {
-  addGradientBg(frame, [[0, { r: 0.059, g: 0.161, b: 0.125 }], [1, C.bg]]);
+  addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepBlue], [1, C.deepPurple]]);
   addPhotoPlaceholder(frame, 'Relaxed outdoor hangout with friends', 0, W, H, C.green);
-  addOverlay(frame, 0.93);
+  addOverlay(frame, 0.5);
   addText(frame, '✅ EASY MODE', { y: 280, size: 28, weight: 'Bold', color: C.green });
   addCard(frame, 80, 380, W - 160, 280, rgba(C.green, 0.06), rgba(C.green, 0.2));
   addText(frame, 'Stranger Selfie', { x: 130, y: 420, size: 44, weight: 'Extra Bold', align: 'LEFT', width: 780 });
@@ -345,9 +353,9 @@ function slide2_easy(frame) {
 }
 
 function slide2_bold(frame) {
-  addGradientBg(frame, [[0, { r: 0.176, g: 0.094, b: 0.063 }], [1, C.bg]]);
+  addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPink], [1, C.deepPurple]]);
   addPhotoPlaceholder(frame, 'Energetic outdoor party group', 0, W, H, C.orange);
-  addOverlay(frame, 0.92);
+  addOverlay(frame, 0.45);
   addText(frame, '🔥🔥🔥', { y: 280, size: 70 });
   addText(frame, 'BOLD MODE', { y: 400, size: 28, weight: 'Bold', color: C.orange });
   addCard(frame, 80, 490, W - 160, 280, rgba(C.orange, 0.06), rgba(C.orange, 0.2));
@@ -394,9 +402,9 @@ function slide2_vs(frame) {
 }
 
 function slide2_cta(frame) {
-  addGradientBg(frame, [[0, { r: 0.118, g: 0.106, b: 0.302 }], [0.5, C.bg], [1, { r: 0.059, g: 0.161, b: 0.125 }]]);
+  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
   addPhotoPlaceholder(frame, 'Beer cheers outdoor', 0, W, H, C.primary);
-  addOverlay(frame, 0.8);
+  addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 680, size: 90, weight: 'Black', color: C.primary });
   addText(frame, 'How bold are you willing to go?', { y: 810, size: 50, weight: 'Extra Bold' });
   addPill(frame, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 34);
@@ -405,9 +413,9 @@ function slide2_cta(frame) {
 
 // SLIDESHOW 3
 function slide3_hook(frame) {
-  addGradientBg(frame, [[0, C.bg], [1, C.dark]]);
+  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
   addPhotoPlaceholder(frame, 'Group outdoor with drinks/beers', 0, W, H, C.primary);
-  addOverlay(frame, 0.7);
+  addOverlay(frame, 0.4);
   addText(frame, '😎  🔥  💀', { y: 640, size: 70 });
   addText(frame, 'Not every night is the same vibe', { y: 780, size: 62, weight: 'Black' });
   addText(frame, "That's why SpyShot has 3 intensity modes", { y: 1020, size: 28, color: rgba(C.white, 0.45) });
@@ -415,9 +423,15 @@ function slide3_hook(frame) {
 }
 
 function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, tasks, slideNum, bgPhoto) {
-  addGradientBg(frame, [[0, C.dark], [1, C.bg]]);
+  // Each mode gets a distinct vibrant gradient
+  var gradients = {
+    'CHILL': [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.deepGreen]],
+    'WILD': [[0, C.deepOrange], [0.5, C.midPink], [1, C.deepPurple]],
+    'EXTREME': [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]
+  };
+  addGradientBg(frame, gradients[name] || [[0, C.deepPurple], [1, C.deepPink]]);
   addPhotoPlaceholder(frame, bgPhoto, 0, W, H, borderColor);
-  addOverlay(frame, 0.93);
+  addOverlay(frame, 0.5);
   addText(frame, emoji, { y: 200, size: 90 });
   addText(frame, name, { y: 320, size: 66, weight: 'Black', color: nameColor });
   addText(frame, desc, { y: 410, size: 30, color: descColor });
@@ -466,9 +480,9 @@ function slide3_extreme(frame) {
 }
 
 function slide3_cta(frame) {
-  addGradientBg(frame, [[0, C.bg], [1, C.dark]]);
+  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
   addPhotoPlaceholder(frame, 'Beers outdoor close-up', 0, W, H, C.primary);
-  addOverlay(frame, 0.85);
+  addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 620, size: 80, weight: 'Black', color: C.primary });
   addText(frame, 'Pick your vibe. Start the game.', { y: 750, size: 48, weight: 'Extra Bold' });
   addPill(frame, 'Chill', W / 2 - 300, 900, rgba(C.blue, 0.2), C.blue, 26);
