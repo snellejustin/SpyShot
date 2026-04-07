@@ -21,8 +21,22 @@ const C = {
   textSec: { r: 0.820, g: 0.835, b: 0.855 },    // #d1d5db
 };
 
+// Figma solid fills: color = {r,g,b}, opacity is separate.
+// Figma gradient stops: color = {r,g,b,a} — alpha IS on the color.
+function clr(c) { return { r: c.r, g: c.g, b: c.b }; }
+
+// For gradient stop colors (includes alpha)
 function rgb(c, a) { return { r: c.r, g: c.g, b: c.b, a: a !== undefined ? a : 1 }; }
+
+// Shorthand to create a color with alpha (used by addText/addCard to detect opacity)
 function rgba(c, a) { return { r: c.r, g: c.g, b: c.b, a: a }; }
+
+// For solid fills (opacity separate)
+function solidFill(c, opacity) {
+  var f = { type: 'SOLID', color: clr(c) };
+  if (opacity !== undefined && opacity < 1) f.opacity = opacity;
+  return f;
+}
 
 async function loadFont() {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
@@ -40,7 +54,7 @@ function createSlideFrame(name, x, y) {
   frame.x = x;
   frame.y = y;
   frame.clipsContent = true;
-  frame.fills = [{ type: 'SOLID', color: C.bg }];
+  frame.fills = [solidFill(C.bg)];
   frame.layoutMode = 'NONE';
   return frame;
 }
@@ -67,8 +81,8 @@ function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x) {
   group.resize(w || W, h || H);
   group.x = x || 0;
   group.y = y || 0;
-  group.fills = [{ type: 'SOLID', color: C.surface }];
-  group.strokes = [{ type: 'SOLID', color: borderColor || C.border }];
+  group.fills = [solidFill(C.surface)];
+  group.strokes = [solidFill(borderColor || C.border)];
   group.strokeWeight = 2;
   group.dashPattern = [8, 4];
   group.cornerRadius = 16;
@@ -80,7 +94,7 @@ function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x) {
   txt.characters = '📷 ' + label;
   txt.fontSize = w && w < 300 ? 14 : 18;
   txt.fontName = { family: "Inter", style: "Medium" };
-  txt.fills = [{ type: 'SOLID', color: C.textMuted }];
+  txt.fills = [solidFill(C.textMuted)];
   txt.textAlignHorizontal = 'CENTER';
   group.appendChild(txt);
 
@@ -98,7 +112,9 @@ function addText(parent, str, opts = {}) {
   txt.characters = str;
   txt.fontSize = size;
   txt.fontName = { family: "Inter", style: weight };
-  txt.fills = [{ type: 'SOLID', color: color }];
+  // Handle colors that might have .a (opacity) from rgba()
+  var fillOpacity = color.a !== undefined ? color.a : 1;
+  txt.fills = [solidFill(color, fillOpacity)];
   txt.textAlignHorizontal = align;
   txt.textAutoResize = 'HEIGHT';
   txt.resize(width, 10);
@@ -121,7 +137,7 @@ function addPill(parent, str, x, y, bgColor, textColor, size) {
   frame.paddingTop = 16;
   frame.paddingBottom = 16;
   frame.cornerRadius = 40;
-  frame.fills = [{ type: 'SOLID', color: bgColor }];
+  frame.fills = [solidFill(bgColor)];
   frame.x = x;
   frame.y = y;
 
@@ -129,7 +145,7 @@ function addPill(parent, str, x, y, bgColor, textColor, size) {
   txt.characters = str;
   txt.fontSize = size || 30;
   txt.fontName = { family: "Inter", style: "Extra Bold" };
-  txt.fills = [{ type: 'SOLID', color: textColor }];
+  txt.fills = [solidFill(textColor)];
   frame.appendChild(txt);
 
   parent.appendChild(frame);
@@ -143,9 +159,12 @@ function addCard(parent, x, y, w, h, bgColor, borderColor) {
   rect.y = y;
   rect.resize(w, h);
   rect.cornerRadius = 24;
-  rect.fills = [{ type: 'SOLID', color: bgColor || C.surface, opacity: 0.3 }];
+  var bg = bgColor || C.surface;
+  var bgOpacity = bg.a !== undefined ? bg.a : 0.3;
+  rect.fills = [solidFill(bg, bgOpacity)];
   if (borderColor) {
-    rect.strokes = [{ type: 'SOLID', color: borderColor }];
+    var bOpacity = borderColor.a !== undefined ? borderColor.a : 1;
+    rect.strokes = [solidFill(borderColor, bOpacity)];
     rect.strokeWeight = 1;
     rect.strokeAlign = 'INSIDE';
   }
@@ -158,7 +177,7 @@ function addCircle(parent, x, y, r, color) {
   e.x = x - r;
   e.y = y - r;
   e.resize(r * 2, r * 2);
-  e.fills = [{ type: 'SOLID', color }];
+  e.fills = [solidFill(color)];
   parent.appendChild(e);
   return e;
 }
@@ -341,12 +360,12 @@ function slide2_vs(frame) {
   // Left half - Easy
   const leftBg = figma.createRectangle();
   leftBg.resize(W / 2, H);
-  leftBg.fills = [{ type: 'SOLID', color: C.green }];
+  leftBg.fills = [solidFill(C.green)];
   frame.appendChild(leftBg);
   addPhotoPlaceholder(frame, 'Chill hangout photo', 0, W / 2, H, C.green, 0);
   const leftOv = figma.createRectangle();
   leftOv.resize(W / 2, H);
-  leftOv.fills = [{ type: 'SOLID', color: C.green, opacity: 0.7 }];
+  leftOv.fills = [solidFill(C.green, 0.7)];
   frame.appendChild(leftOv);
   addText(frame, 'Easy', { x: 0, y: 800, size: 56, weight: 'Black', align: 'CENTER', width: W / 2 });
   addText(frame, 'Chill vibes\nStandard points\nNo pressure', { x: 0, y: 890, size: 28, align: 'CENTER', width: W / 2 });
@@ -355,13 +374,13 @@ function slide2_vs(frame) {
   const rightBg = figma.createRectangle();
   rightBg.x = W / 2;
   rightBg.resize(W / 2, H);
-  rightBg.fills = [{ type: 'SOLID', color: C.orange }];
+  rightBg.fills = [solidFill(C.orange)];
   frame.appendChild(rightBg);
   addPhotoPlaceholder(frame, 'Wild party photo', 0, W / 2, H, C.orange, W / 2);
   const rightOv = figma.createRectangle();
   rightOv.x = W / 2;
   rightOv.resize(W / 2, H);
-  rightOv.fills = [{ type: 'SOLID', color: C.orange, opacity: 0.7 }];
+  rightOv.fills = [solidFill(C.orange, 0.7)];
   frame.appendChild(rightOv);
   addText(frame, 'Bold', { x: W / 2, y: 800, size: 56, weight: 'Black', align: 'CENTER', width: W / 2 });
   addText(frame, 'Maximum chaos\nDouble points\nLegend status', { x: W / 2, y: 890, size: 28, align: 'CENTER', width: W / 2 });
@@ -481,7 +500,7 @@ async function main() {
     label.characters = section.title;
     label.fontSize = 48;
     label.fontName = { family: "Inter", style: "Bold" };
-    label.fills = [{ type: 'SOLID', color: C.primary }];
+    label.fills = [solidFill(C.primary)];
     label.x = xOffset;
     label.y = -80;
     page.appendChild(label);
