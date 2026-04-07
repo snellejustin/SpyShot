@@ -186,12 +186,14 @@ function addOverlay(parent, opacity) {
   const rect = figma.createRectangle();
   rect.name = 'Dark Overlay';
   rect.resize(W, H);
+  var o = opacity || 0.7;
+  var black = { r: 0, g: 0, b: 0 };
   rect.fills = [{
     type: 'GRADIENT_LINEAR',
     gradientStops: [
-      { position: 0, color: rgb({ r: 0, g: 0, b: 0 }, opacity || 0.7) },
-      { position: 0.5, color: rgb({ r: 0, g: 0, b: 0 }, (opacity || 0.7) - 0.15) },
-      { position: 1, color: rgb({ r: 0, g: 0, b: 0 }, (opacity || 0.7) + 0.1) },
+      { position: 0, color: rgb(black, Math.min(o, 1)) },
+      { position: 0.5, color: rgb(black, Math.max(o - 0.15, 0)) },
+      { position: 1, color: rgb(black, Math.min(o + 0.1, 1)) },
     ],
     gradientTransform: [[0, 0, 0], [0, 1, 0]],
   }];
