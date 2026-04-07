@@ -21,7 +21,8 @@ const C = {
   textSec: { r: 0.820, g: 0.835, b: 0.855 },    // #d1d5db
 };
 
-function rgb(c, a) { return { ...c, a: a !== undefined ? a : 1 }; }
+function rgb(c, a) { return { r: c.r, g: c.g, b: c.b, a: a !== undefined ? a : 1 }; }
+function rgba(c, a) { return { r: c.r, g: c.g, b: c.b, a: a }; }
 
 async function loadFont() {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
@@ -62,7 +63,7 @@ function addGradientBg(parent, colors) {
 
 function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x) {
   const group = figma.createFrame();
-  group.name = `📷 ${label}`;
+  group.name = '📷 ' + label;
   group.resize(w || W, h || H);
   group.x = x || 0;
   group.y = y || 0;
@@ -179,9 +180,9 @@ function addOverlay(parent, opacity) {
 }
 
 function slideLabel(parent, current, total) {
-  addText(parent, `SLIDE ${current} OF ${total}`, {
+  addText(parent, 'SLIDE ' + current + ' OF ' + total, {
     y: H - 70, size: 20, weight: 'Semi Bold',
-    color: { ...C.white, a: 0.25 },
+    color: rgba(C.white, 0.25),
   });
 }
 
@@ -195,7 +196,7 @@ function slide1_hook(frame) {
   addOverlay(frame, 0.65);
   addText(frame, 'YOUR PARTIES ARE ABOUT TO CHANGE', { y: 680, size: 30, weight: 'Semi Bold', color: C.primary });
   addText(frame, 'The app that turns any night out into a legendary story', { y: 760, size: 72, weight: 'Black' });
-  addText(frame, 'SWIPE →', { y: H - 110, size: 26, color: { ...C.white, a: 0.4 } });
+  addText(frame, 'SWIPE →', { y: H - 110, size: 26, color: rgba(C.white, 0.4) });
   slideLabel(frame, 1, 6);
 }
 
@@ -235,7 +236,7 @@ function slide1_solution(frame) {
   ];
   let fy = 500;
   features.forEach(([icon, title, desc]) => {
-    addCard(frame, 80, fy, W - 160, 95, { ...C.white, a: 0.04 }, { ...C.white, a: 0.08 });
+    addCard(frame, 80, fy, W - 160, 95, rgba(C.white, 0.04), rgba(C.white, 0.08));
     addText(frame, icon, { x: 110, y: fy + 28, size: 36, align: 'LEFT', width: 50 });
     addText(frame, title, { x: 180, y: fy + 20, size: 28, weight: 'Bold', align: 'LEFT', width: 600 });
     addText(frame, desc, { x: 180, y: fy + 56, size: 20, weight: 'Regular', color: C.textMuted, align: 'LEFT', width: 600 });
@@ -274,12 +275,12 @@ function slide1_socialProof(frame) {
   addText(frame, '"', { y: 380, size: 140, weight: 'Black', color: C.primary });
   addText(frame, "We used SpyShot at our house party and it was genuinely the most fun we've had in months. Everyone was crying laughing.", { y: 560, size: 40, weight: 'Semi Bold' });
   addText(frame, '— @emma_w', { y: 900, size: 28, weight: 'Bold', color: C.primary });
-  addText(frame, 'Gold tier badge holder', { y: 940, size: 22, color: { ...C.white, a: 0.4 } });
+  addText(frame, 'Gold tier badge holder', { y: 940, size: 22, color: rgba(C.white, 0.4) });
   const stats = [['120+', 'Challenges'], ['3', 'Intensities'], ['9', 'Badge Tiers']];
   stats.forEach(([num, label], i) => {
     const sx = 200 + i * 280;
     addText(frame, num, { x: sx - 60, y: 1100, size: 50, weight: 'Black', color: C.primary, align: 'CENTER', width: 120 });
-    addText(frame, label, { x: sx - 80, y: 1165, size: 20, weight: 'Medium', color: { ...C.white, a: 0.5 }, align: 'CENTER', width: 160 });
+    addText(frame, label, { x: sx - 80, y: 1165, size: 20, weight: 'Medium', color: rgba(C.white, 0.5), align: 'CENTER', width: 160 });
   });
   slideLabel(frame, 5, 6);
 }
@@ -291,7 +292,7 @@ function slide1_cta(frame) {
   addText(frame, 'SpyShot', { y: 600, size: 100, weight: 'Black', color: C.primary });
   addText(frame, 'Your next night out deserves to be legendary', { y: 750, size: 48, weight: 'Extra Bold' });
   addPill(frame, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 34);
-  addText(frame, 'Available on iOS & Android', { y: 1080, size: 24, color: { ...C.white, a: 0.4 } });
+  addText(frame, 'Available on iOS & Android', { y: 1080, size: 24, color: rgba(C.white, 0.4) });
   slideLabel(frame, 6, 6);
 }
 
@@ -302,7 +303,7 @@ function slide2_hook(frame) {
   addOverlay(frame, 0.65);
   addText(frame, '🔥', { y: 620, size: 100 });
   addText(frame, 'Every task has two versions', { y: 760, size: 66, weight: 'Black' });
-  addText(frame, 'Do you play it safe... or go BOLD?', { y: 1020, size: 30, color: { ...C.white, a: 0.55 } });
+  addText(frame, 'Do you play it safe... or go BOLD?', { y: 1020, size: 30, color: rgba(C.white, 0.55) });
   slideLabel(frame, 1, 5);
 }
 
@@ -311,7 +312,7 @@ function slide2_easy(frame) {
   addPhotoPlaceholder(frame, 'Relaxed outdoor hangout with friends', 0, W, H, C.green);
   addOverlay(frame, 0.93);
   addText(frame, '✅ EASY MODE', { y: 280, size: 28, weight: 'Bold', color: C.green });
-  addCard(frame, 80, 380, W - 160, 280, { ...C.green, a: 0.06 }, { ...C.green, a: 0.2 });
+  addCard(frame, 80, 380, W - 160, 280, rgba(C.green, 0.06), rgba(C.green, 0.2));
   addText(frame, 'Stranger Selfie', { x: 130, y: 420, size: 44, weight: 'Extra Bold', align: 'LEFT', width: 780 });
   addText(frame, "Take a selfie with someone you don't know", { x: 130, y: 485, size: 30, weight: 'Regular', color: C.textSec, align: 'LEFT', width: 780 });
   addText(frame, '+1 point  ·  Standard badge progress', { x: 130, y: 570, size: 24, weight: 'Bold', color: C.green, align: 'LEFT', width: 780 });
@@ -328,7 +329,7 @@ function slide2_bold(frame) {
   addOverlay(frame, 0.92);
   addText(frame, '🔥🔥🔥', { y: 280, size: 70 });
   addText(frame, 'BOLD MODE', { y: 400, size: 28, weight: 'Bold', color: C.orange });
-  addCard(frame, 80, 490, W - 160, 280, { ...C.orange, a: 0.06 }, { ...C.orange, a: 0.2 });
+  addCard(frame, 80, 490, W - 160, 280, rgba(C.orange, 0.06), rgba(C.orange, 0.2));
   addText(frame, 'Stranger Selfie', { x: 130, y: 530, size: 44, weight: 'Extra Bold', align: 'LEFT', width: 780 });
   addText(frame, 'Take a selfie with THREE people you don\'t know', { x: 130, y: 595, size: 30, weight: 'Regular', color: C.textSec, align: 'LEFT', width: 780 });
   addText(frame, '+2 points  ·  2x badge progress', { x: 130, y: 680, size: 24, weight: 'Bold', color: C.orange, align: 'LEFT', width: 780 });
@@ -388,7 +389,7 @@ function slide3_hook(frame) {
   addOverlay(frame, 0.7);
   addText(frame, '😎  🔥  💀', { y: 640, size: 70 });
   addText(frame, 'Not every night is the same vibe', { y: 780, size: 62, weight: 'Black' });
-  addText(frame, "That's why SpyShot has 3 intensity modes", { y: 1020, size: 28, color: { ...C.white, a: 0.45 } });
+  addText(frame, "That's why SpyShot has 3 intensity modes", { y: 1020, size: 28, color: rgba(C.white, 0.45) });
   slideLabel(frame, 1, 5);
 }
 
@@ -401,7 +402,7 @@ function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, 
   addText(frame, desc, { y: 410, size: 30, color: descColor });
   let ty = 510;
   tasks.forEach(t => {
-    addCard(frame, 80, ty, W - 160, 65, { ...borderColor, a: 0.05 }, { ...borderColor, a: 0.15 });
+    addCard(frame, 80, ty, W - 160, 65, rgba(borderColor, 0.05), rgba(borderColor, 0.15));
     addText(frame, t, { x: 110, y: ty + 16, size: 24, weight: 'Regular', align: 'LEFT', width: 820 });
     ty += 82;
   });
@@ -449,9 +450,9 @@ function slide3_cta(frame) {
   addOverlay(frame, 0.85);
   addText(frame, 'SpyShot', { y: 620, size: 80, weight: 'Black', color: C.primary });
   addText(frame, 'Pick your vibe. Start the game.', { y: 750, size: 48, weight: 'Extra Bold' });
-  addPill(frame, 'Chill', W / 2 - 300, 900, { ...C.blue, a: 0.2 }, C.blue, 26);
-  addPill(frame, 'Wild', W / 2 - 60, 900, { ...C.orange, a: 0.2 }, C.orange, 26);
-  addPill(frame, 'Extreme', W / 2 + 160, 900, { ...C.pink, a: 0.2 }, C.pink, 26);
+  addPill(frame, 'Chill', W / 2 - 300, 900, rgba(C.blue, 0.2), C.blue, 26);
+  addPill(frame, 'Wild', W / 2 - 60, 900, rgba(C.orange, 0.2), C.orange, 26);
+  addPill(frame, 'Extreme', W / 2 + 160, 900, rgba(C.pink, 0.2), C.pink, 26);
   addPill(frame, 'Download Free', (W - 340) / 2, 1020, C.primary, C.dark, 34);
   slideLabel(frame, 5, 5);
 }
@@ -486,7 +487,7 @@ async function main() {
     page.appendChild(label);
 
     for (let i = 0; i < section.slides.length; i++) {
-      const frame = createSlideFrame(`${section.title} — Slide ${i + 1}`, xOffset, 0);
+      var frame = createSlideFrame(section.title + ' — Slide ' + (i + 1), xOffset, 0);
       page.appendChild(frame);
       section.slides[i](frame);
       xOffset += W + GAP;
