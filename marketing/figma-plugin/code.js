@@ -46,6 +46,59 @@ function solidFill(c, opacity) {
   return f;
 }
 
+// Image URLs mapped to each slide
+var IMAGES = {
+  // Slideshow 1
+  's1_hook': 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1080&q=75',
+  's1_problem': 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1080&q=75',
+  's1_solution': 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1080&q=75',
+  's1_how': 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1080&q=75',
+  's1_proof': 'https://images.unsplash.com/photo-1545128485-c400e7702796?w=1080&q=75',
+  's1_cta': 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1080&q=75',
+  // Slideshow 2
+  's2_hook': 'https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=1080&q=75',
+  's2_easy': 'https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=1080&q=75',
+  's2_bold': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1080&q=75',
+  's2_vs_left': 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=540&q=70',
+  's2_vs_right': 'https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=540&q=70',
+  's2_cta': 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1080&q=75',
+  // Slideshow 3
+  's3_hook': 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1080&q=75',
+  's3_chill': 'https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=1080&q=75',
+  's3_wild': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1080&q=75',
+  's3_extreme': 'https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=1080&q=75',
+  's3_cta': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1080&q=75',
+};
+
+// Cache for loaded images + queue for deferred loading
+var imageCache = {};
+var imageQueue = [];
+
+async function loadImage(url) {
+  if (imageCache[url]) return imageCache[url];
+  try {
+    var response = await fetch(url);
+    var buffer = await response.arrayBuffer();
+    var img = figma.createImage(new Uint8Array(buffer));
+    imageCache[url] = img;
+    return img;
+  } catch (e) {
+    console.log('Failed to load image: ' + url);
+    return null;
+  }
+}
+
+async function setImageFill(node, url) {
+  var img = await loadImage(url);
+  if (img) {
+    node.fills = [{
+      type: 'IMAGE',
+      imageHash: img.hash,
+      scaleMode: 'FILL'
+    }];
+  }
+}
+
 async function loadFont() {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
   await figma.loadFontAsync({ family: "Inter", style: "Medium" });
@@ -83,28 +136,19 @@ function addGradientBg(parent, colors) {
   return rect;
 }
 
-function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x) {
-  const group = figma.createFrame();
+function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x, imageKey) {
+  var group = figma.createRectangle();
   group.name = '📷 ' + label;
   group.resize(w || W, h || H);
   group.x = x || 0;
   group.y = y || 0;
   group.fills = [solidFill(C.surface)];
-  group.strokes = [solidFill(borderColor || C.border)];
-  group.strokeWeight = 2;
-  group.dashPattern = [8, 4];
-  group.cornerRadius = 16;
-  group.layoutMode = 'VERTICAL';
-  group.primaryAxisAlignItems = 'CENTER';
-  group.counterAxisAlignItems = 'CENTER';
+  group.cornerRadius = (w && w < W) ? 16 : 0;
 
-  const txt = figma.createText();
-  txt.characters = '📷 ' + label;
-  txt.fontSize = w && w < 300 ? 14 : 18;
-  txt.fontName = { family: "Inter", style: "Medium" };
-  txt.fills = [solidFill(C.textMuted)];
-  txt.textAlignHorizontal = 'CENTER';
-  group.appendChild(txt);
+  // Queue image loading if an imageKey is provided
+  if (imageKey && IMAGES[imageKey]) {
+    imageQueue.push({ node: group, url: IMAGES[imageKey] });
+  }
 
   parent.appendChild(group);
   return group;
@@ -221,7 +265,7 @@ function slideLabel(parent, current, total) {
 
 function slide1_hook(frame) {
   addGradientBg(frame, [[0, C.deepPurple], [0.5, C.midPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Friends group selfie outdoor with beers', 0, W, H, C.primary);
+  addPhotoPlaceholder(frame, 'Friends group selfie outdoor with beers', 0, W, H, C.primary, null, 's1_hook');
   addOverlay(frame, 0.45);
   addText(frame, 'YOUR PARTIES ARE ABOUT TO CHANGE', { y: 680, size: 30, weight: 'Semi Bold', color: C.primary });
   addText(frame, 'The app that turns any night out into a legendary story', { y: 760, size: 72, weight: 'Black' });
@@ -231,7 +275,7 @@ function slide1_hook(frame) {
 
 function slide1_problem(frame) {
   addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepBlue]]);
-  addPhotoPlaceholder(frame, 'People bored on phones at party/gathering', 0, W, H, C.error);
+  addPhotoPlaceholder(frame, 'People bored on phones at party/gathering', 0, W, H, C.error, null, 's1_problem');
   addOverlay(frame, 0.55);
   addText(frame, "We've all been there...", { y: 180, size: 58, weight: 'Extra Bold' });
   const problems = [
@@ -252,7 +296,7 @@ function slide1_problem(frame) {
 
 function slide1_solution(frame) {
   addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPurple], [1, C.deepGreen]]);
-  addPhotoPlaceholder(frame, 'Group of friends having fun at outdoor party', 0, W, H, C.green);
+  addPhotoPlaceholder(frame, 'Group of friends having fun at outdoor party', 0, W, H, C.green, null, 's1_solution');
   addOverlay(frame, 0.5);
   addText(frame, 'SpyShot', { y: 240, size: 88, weight: 'Black', color: C.primary });
   addText(frame, 'The party game that plays itself', { y: 360, size: 36, weight: 'Semi Bold' });
@@ -276,7 +320,7 @@ function slide1_solution(frame) {
 
 function slide1_howItWorks(frame) {
   addGradientBg(frame, [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.midPurple]]);
-  addPhotoPlaceholder(frame, 'Friends at outdoor dinner/gathering', 0, W, H, C.blue);
+  addPhotoPlaceholder(frame, 'Friends at outdoor dinner/gathering', 0, W, H, C.blue, null, 's1_how');
   addOverlay(frame, 0.5);
   addText(frame, 'How SpyShot works', { y: 140, size: 52, weight: 'Extra Bold' });
   const steps = [
@@ -299,7 +343,7 @@ function slide1_howItWorks(frame) {
 
 function slide1_socialProof(frame) {
   addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, 'Friends laughing at outdoor party/BBQ', 0, W, H, C.green);
+  addPhotoPlaceholder(frame, 'Friends laughing at outdoor party/BBQ', 0, W, H, C.green, null, 's1_proof');
   addOverlay(frame, 0.4);
   addText(frame, '"', { y: 380, size: 140, weight: 'Black', color: C.primary });
   addText(frame, "We used SpyShot at our house party and it was genuinely the most fun we've had in months. Everyone was crying laughing.", { y: 560, size: 40, weight: 'Semi Bold' });
@@ -316,7 +360,7 @@ function slide1_socialProof(frame) {
 
 function slide1_cta(frame) {
   addGradientBg(frame, [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beer cheers outdoor close-up', 0, W, H, C.primary);
+  addPhotoPlaceholder(frame, 'Beer cheers outdoor close-up', 0, W, H, C.primary, null, 's1_cta');
   addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 600, size: 100, weight: 'Black', color: C.primary });
   addText(frame, 'Your next night out deserves to be legendary', { y: 750, size: 48, weight: 'Extra Bold' });
@@ -328,7 +372,7 @@ function slide1_cta(frame) {
 // SLIDESHOW 2
 function slide2_hook(frame) {
   addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, 'Friends cheersing beers at outdoor gathering', 0, W, H, C.orange);
+  addPhotoPlaceholder(frame, 'Friends cheersing beers at outdoor gathering', 0, W, H, C.orange, null, 's2_hook');
   addOverlay(frame, 0.4);
   addText(frame, '🔥', { y: 620, size: 100 });
   addText(frame, 'Every task has two versions', { y: 760, size: 66, weight: 'Black' });
@@ -338,7 +382,7 @@ function slide2_hook(frame) {
 
 function slide2_easy(frame) {
   addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepBlue], [1, C.deepPurple]]);
-  addPhotoPlaceholder(frame, 'Relaxed outdoor hangout with friends', 0, W, H, C.green);
+  addPhotoPlaceholder(frame, 'Relaxed outdoor hangout with friends', 0, W, H, C.green, null, 's2_easy');
   addOverlay(frame, 0.5);
   addText(frame, '✅ EASY MODE', { y: 280, size: 28, weight: 'Bold', color: C.green });
   addCard(frame, 80, 380, W - 160, 280, rgba(C.green, 0.06), rgba(C.green, 0.2));
@@ -354,7 +398,7 @@ function slide2_easy(frame) {
 
 function slide2_bold(frame) {
   addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPink], [1, C.deepPurple]]);
-  addPhotoPlaceholder(frame, 'Energetic outdoor party group', 0, W, H, C.orange);
+  addPhotoPlaceholder(frame, 'Energetic outdoor party group', 0, W, H, C.orange, null, 's2_bold');
   addOverlay(frame, 0.45);
   addText(frame, '🔥🔥🔥', { y: 280, size: 70 });
   addText(frame, 'BOLD MODE', { y: 400, size: 28, weight: 'Bold', color: C.orange });
@@ -372,7 +416,7 @@ function slide2_vs(frame) {
   leftBg.resize(W / 2, H);
   leftBg.fills = [solidFill(C.green)];
   frame.appendChild(leftBg);
-  addPhotoPlaceholder(frame, 'Chill hangout photo', 0, W / 2, H, C.green, 0);
+  addPhotoPlaceholder(frame, 'Chill hangout photo', 0, W / 2, H, C.green, 0, 's2_vs_left');
   const leftOv = figma.createRectangle();
   leftOv.resize(W / 2, H);
   leftOv.fills = [solidFill(C.green, 0.7)];
@@ -386,7 +430,7 @@ function slide2_vs(frame) {
   rightBg.resize(W / 2, H);
   rightBg.fills = [solidFill(C.orange)];
   frame.appendChild(rightBg);
-  addPhotoPlaceholder(frame, 'Wild party photo', 0, W / 2, H, C.orange, W / 2);
+  addPhotoPlaceholder(frame, 'Wild party photo', 0, W / 2, H, C.orange, W / 2, 's2_vs_right');
   const rightOv = figma.createRectangle();
   rightOv.x = W / 2;
   rightOv.resize(W / 2, H);
@@ -403,7 +447,7 @@ function slide2_vs(frame) {
 
 function slide2_cta(frame) {
   addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beer cheers outdoor', 0, W, H, C.primary);
+  addPhotoPlaceholder(frame, 'Beer cheers outdoor', 0, W, H, C.primary, null, 's2_cta');
   addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 680, size: 90, weight: 'Black', color: C.primary });
   addText(frame, 'How bold are you willing to go?', { y: 810, size: 50, weight: 'Extra Bold' });
@@ -414,7 +458,7 @@ function slide2_cta(frame) {
 // SLIDESHOW 3
 function slide3_hook(frame) {
   addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Group outdoor with drinks/beers', 0, W, H, C.primary);
+  addPhotoPlaceholder(frame, 'Group outdoor with drinks/beers', 0, W, H, C.primary, null, 's3_hook');
   addOverlay(frame, 0.4);
   addText(frame, '😎  🔥  💀', { y: 640, size: 70 });
   addText(frame, 'Not every night is the same vibe', { y: 780, size: 62, weight: 'Black' });
@@ -422,7 +466,7 @@ function slide3_hook(frame) {
   slideLabel(frame, 1, 5);
 }
 
-function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, tasks, slideNum, bgPhoto) {
+function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, tasks, slideNum, bgPhoto, imageKey) {
   // Each mode gets a distinct vibrant gradient
   var gradients = {
     'CHILL': [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.deepGreen]],
@@ -430,7 +474,7 @@ function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, 
     'EXTREME': [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]
   };
   addGradientBg(frame, gradients[name] || [[0, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, bgPhoto, 0, W, H, borderColor);
+  addPhotoPlaceholder(frame, bgPhoto, 0, W, H, borderColor, null, imageKey);
   addOverlay(frame, 0.5);
   addText(frame, emoji, { y: 200, size: 90 });
   addText(frame, name, { y: 320, size: 66, weight: 'Black', color: nameColor });
@@ -452,7 +496,7 @@ function slide3_chill(frame) {
     '🤝  Compliment everyone at the table',
     '🎭  Celebrity impression contest',
     '💬  Two truths and one lie',
-  ], 2, 'Relaxed hangout with friends and beers');
+  ], 2, 'Relaxed hangout with friends and beers', 's3_chill');
   addPhotoPlaceholder(frame, 'Chill photo 1', ty + 20, 260, 180, C.blue, 100);
   addPhotoPlaceholder(frame, 'Chill photo 2', ty + 20, 260, 180, C.blue, 390);
   addPhotoPlaceholder(frame, 'Chill photo 3', ty + 20, 260, 180, C.blue, 680);
@@ -465,7 +509,7 @@ function slide3_wild(frame) {
     '🎸  30-second air guitar solo',
     '📸  Photobomb as many photos as possible',
     '🎵  Request a song — if it plays, everyone drinks',
-  ], 3, 'Festival or outdoor party energy');
+  ], 3, 'Festival or outdoor party energy', 's3_wild');
 }
 
 function slide3_extreme(frame) {
@@ -475,13 +519,13 @@ function slide3_extreme(frame) {
     '🍋  Eat a lemon without making a face',
     '🎙️  Give a speech standing on a chair',
     '🔥  Full roast battle — group votes winner',
-  ], 4, 'Intense crowd energy outdoor');
+  ], 4, 'Intense crowd energy outdoor', 's3_extreme');
   addText(frame, '* Not for the faint of heart', { y: ty + 20, size: 24, weight: 'Semi Bold', color: C.pink });
 }
 
 function slide3_cta(frame) {
   addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beers outdoor close-up', 0, W, H, C.primary);
+  addPhotoPlaceholder(frame, 'Beers outdoor close-up', 0, W, H, C.primary, null, 's3_cta');
   addOverlay(frame, 0.4);
   addText(frame, 'SpyShot', { y: 620, size: 80, weight: 'Black', color: C.primary });
   addText(frame, 'Pick your vibe. Start the game.', { y: 750, size: 48, weight: 'Extra Bold' });
@@ -530,9 +574,22 @@ async function main() {
     xOffset += GAP * 2; // Extra gap between sections
   }
 
+  // Load all queued images
+  figma.notify('Loading ' + imageQueue.length + ' images from Unsplash...');
+  var loaded = 0;
+  var failed = 0;
+  for (var q = 0; q < imageQueue.length; q++) {
+    try {
+      await setImageFill(imageQueue[q].node, imageQueue[q].url);
+      loaded++;
+    } catch (e) {
+      failed++;
+    }
+  }
+
   // Zoom to fit
   figma.viewport.scrollAndZoomIntoView(page.children);
-  figma.notify('✅ 16 SpyShot slides created!');
+  figma.notify('✅ 16 slides created! ' + loaded + ' images loaded' + (failed > 0 ? ', ' + failed + ' failed' : ''));
   figma.closePlugin();
 }
 

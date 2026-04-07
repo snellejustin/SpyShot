@@ -3,5 +3,11 @@
   "id": "spyshot-slides-001",
   "api": "1.0.0",
   "main": "code.js",
-  "editorType": ["figma"]
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://images.unsplash.com",
+      "https://plus.unsplash.com"
+    ]
+  }
 }
