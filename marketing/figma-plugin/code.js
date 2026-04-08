@@ -1,76 +1,61 @@
-// SpyShot Figma Slide Generator
-// Creates all 16 marketing slides as editable Figma frames
+// SpyShot Figma Slide Generator v3
+// Clean, no emojis, breathing room, real party photos
 
-const W = 1080;
-const H = 1920;
+var W = 1080;
+var H = 1920;
 
 var C = {
-  bg: { r: 0.122, g: 0.161, b: 0.216 },       // #1f2937
-  dark: { r: 0.067, g: 0.094, b: 0.153 },      // #111827
-  surface: { r: 0.216, g: 0.255, b: 0.318 },    // #374151
-  border: { r: 0.294, g: 0.333, b: 0.388 },     // #4b5563
-  primary: { r: 0.984, g: 0.745, b: 0.141 },    // #fbbf24
-  orange: { r: 0.976, g: 0.451, b: 0.086 },     // #f97316
-  pink: { r: 0.925, g: 0.282, b: 0.600 },       // #ec4899
-  blue: { r: 0.231, g: 0.510, b: 0.965 },       // #3b82f6
-  green: { r: 0.063, g: 0.725, b: 0.506 },      // #10b981
-  purple: { r: 0.659, g: 0.333, b: 0.969 },     // #a855f7
-  error: { r: 0.937, g: 0.267, b: 0.267 },      // #ef4444
+  bg: { r: 0.122, g: 0.161, b: 0.216 },
+  dark: { r: 0.067, g: 0.094, b: 0.153 },
+  surface: { r: 0.216, g: 0.255, b: 0.318 },
+  primary: { r: 0.984, g: 0.745, b: 0.141 },
+  orange: { r: 0.976, g: 0.451, b: 0.086 },
+  pink: { r: 0.925, g: 0.282, b: 0.600 },
+  blue: { r: 0.231, g: 0.510, b: 0.965 },
+  green: { r: 0.063, g: 0.725, b: 0.506 },
+  purple: { r: 0.659, g: 0.333, b: 0.969 },
+  error: { r: 0.937, g: 0.267, b: 0.267 },
   white: { r: 1, g: 1, b: 1 },
-  textMuted: { r: 0.75, g: 0.76, b: 0.8 },      // lighter for vibrant bgs
-  textSec: { r: 0.9, g: 0.91, b: 0.93 },
-  // Deep vibrant backgrounds
-  deepPurple: { r: 0.18, g: 0.05, b: 0.35 },   // #2e0d59
-  deepBlue: { r: 0.05, g: 0.1, b: 0.35 },      // #0d1a59
-  deepPink: { r: 0.35, g: 0.05, b: 0.2 },      // #590d33
-  deepOrange: { r: 0.35, g: 0.15, b: 0.05 },   // #59260d
-  deepGreen: { r: 0.05, g: 0.25, b: 0.18 },    // #0d402e
-  midPurple: { r: 0.3, g: 0.1, b: 0.5 },       // #4d1a80
-  midPink: { r: 0.5, g: 0.1, b: 0.35 },        // #801a59
+  muted: { r: 0.75, g: 0.76, b: 0.8 },
+  deepPurple: { r: 0.18, g: 0.05, b: 0.35 },
+  deepBlue: { r: 0.05, g: 0.1, b: 0.35 },
+  deepPink: { r: 0.35, g: 0.05, b: 0.2 },
+  deepOrange: { r: 0.35, g: 0.15, b: 0.05 },
+  deepGreen: { r: 0.05, g: 0.25, b: 0.18 },
+  midPurple: { r: 0.3, g: 0.1, b: 0.5 },
+  midPink: { r: 0.5, g: 0.1, b: 0.35 },
 };
 
-// Figma solid fills: color = {r,g,b}, opacity is separate.
-// Figma gradient stops: color = {r,g,b,a} — alpha IS on the color.
+// Party photos — groups cheersing, diverse, 18-35, drinks
+var PHOTOS = {
+  cheers1: 'https://images.unsplash.com/photo-1624634564754-e45be6d06159?w=1080&q=75',
+  cheers2: 'https://images.unsplash.com/photo-1700615753059-0780f634a434?w=1080&q=75',
+  cheers3: 'https://images.unsplash.com/photo-1515135385067-5516a1e38bbe?w=1080&q=75',
+  cheers4: 'https://images.unsplash.com/photo-1533242553289-5ed0b2bc5a74?w=1080&q=75',
+  toast1: 'https://images.unsplash.com/photo-1758272133395-b0f83eb6f554?w=1080&q=75',
+  toast2: 'https://images.unsplash.com/photo-1758275557233-773c6c03614e?w=1080&q=75',
+  party1: 'https://images.unsplash.com/photo-1549476465-898c14bf528d?w=1080&q=75',
+  party2: 'https://images.unsplash.com/photo-1511548774318-563182fe8d03?w=1080&q=75',
+  group1: 'https://images.unsplash.com/photo-1528218635780-5952720c9729?w=1080&q=75',
+  group2: 'https://images.unsplash.com/photo-1568237348563-9aa26fed0457?w=1080&q=75',
+  friends1: 'https://images.unsplash.com/photo-1758272133713-52c6bb9f74f0?w=1080&q=75',
+  friends2: 'https://images.unsplash.com/photo-1758272133483-281d50324455?w=1080&q=75',
+  rooftop1: 'https://images.unsplash.com/photo-1758272133542-b3107b947fc2?w=1080&q=75',
+  cans1: 'https://images.unsplash.com/photo-1704403529198-7ed712f31c31?w=1080&q=75',
+  celebrate1: 'https://images.unsplash.com/photo-1763651956731-d3ae654a3ac2?w=1080&q=75',
+  celebrate2: 'https://images.unsplash.com/photo-1763651963738-467583998778?w=1080&q=75',
+  outdoor1: 'https://images.unsplash.com/photo-1758275557250-894dd1e8feb3?w=1080&q=75',
+};
+
 function clr(c) { return { r: c.r, g: c.g, b: c.b }; }
-
-// For gradient stop colors (includes alpha)
 function rgb(c, a) { return { r: c.r, g: c.g, b: c.b, a: a !== undefined ? a : 1 }; }
-
-// Shorthand to create a color with alpha (used by addText/addCard to detect opacity)
 function rgba(c, a) { return { r: c.r, g: c.g, b: c.b, a: a }; }
-
-// For solid fills (opacity separate)
 function solidFill(c, opacity) {
   var f = { type: 'SOLID', color: clr(c) };
   if (opacity !== undefined && opacity < 1) f.opacity = opacity;
   return f;
 }
 
-// Image URLs mapped to each slide
-var IMAGES = {
-  // Slideshow 1
-  's1_hook': 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1080&q=75',
-  's1_problem': 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=1080&q=75',
-  's1_solution': 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1080&q=75',
-  's1_how': 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?w=1080&q=75',
-  's1_proof': 'https://images.unsplash.com/photo-1545128485-c400e7702796?w=1080&q=75',
-  's1_cta': 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1080&q=75',
-  // Slideshow 2
-  's2_hook': 'https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=1080&q=75',
-  's2_easy': 'https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=1080&q=75',
-  's2_bold': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1080&q=75',
-  's2_vs_left': 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=540&q=70',
-  's2_vs_right': 'https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=540&q=70',
-  's2_cta': 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1080&q=75',
-  // Slideshow 3
-  's3_hook': 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1080&q=75',
-  's3_chill': 'https://images.unsplash.com/photo-1560983073-c29bff7438ef?w=1080&q=75',
-  's3_wild': 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1080&q=75',
-  's3_extreme': 'https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=1080&q=75',
-  's3_cta': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1080&q=75',
-};
-
-// Cache for loaded images + queue for deferred loading
 var imageCache = {};
 var imageQueue = [];
 
@@ -82,20 +67,13 @@ async function loadImage(url) {
     var img = figma.createImage(new Uint8Array(buffer));
     imageCache[url] = img;
     return img;
-  } catch (e) {
-    console.log('Failed to load image: ' + url);
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 async function setImageFill(node, url) {
   var img = await loadImage(url);
   if (img) {
-    node.fills = [{
-      type: 'IMAGE',
-      imageHash: img.hash,
-      scaleMode: 'FILL'
-    }];
+    node.fills = [{ type: 'IMAGE', imageHash: img.hash, scaleMode: 'FILL' }];
   }
 }
 
@@ -108,432 +86,364 @@ async function loadFont() {
   await figma.loadFontAsync({ family: "Inter", style: "Black" });
 }
 
-function createSlideFrame(name, x, y) {
-  const frame = figma.createFrame();
-  frame.name = name;
-  frame.resize(W, H);
-  frame.x = x;
-  frame.y = y;
-  frame.clipsContent = true;
-  frame.fills = [solidFill(C.bg)];
-  frame.layoutMode = 'NONE';
-  return frame;
+function makeFrame(name, x, y) {
+  var f = figma.createFrame();
+  f.name = name; f.resize(W, H); f.x = x; f.y = y;
+  f.clipsContent = true; f.fills = [solidFill(C.dark)];
+  return f;
 }
 
-function addGradientBg(parent, colors) {
-  const rect = figma.createRectangle();
-  rect.name = 'Background Gradient';
-  rect.resize(W, H);
-  rect.fills = [{
+function addGradient(parent, stops) {
+  var r = figma.createRectangle();
+  r.name = 'Gradient'; r.resize(W, H);
+  r.fills = [{
     type: 'GRADIENT_LINEAR',
-    gradientStops: colors.map(([pos, color, opacity]) => ({
-      position: pos,
-      color: rgb(color, opacity || 1),
-    })),
-    gradientTransform: [[0.4, 0, 0], [0, 1, 0]],
+    gradientStops: stops.map(function(s) { return { position: s[0], color: rgb(s[1], s[2] || 1) }; }),
+    gradientTransform: [[0.4, 0, 0], [0, 1, 0]]
   }];
-  parent.appendChild(rect);
-  return rect;
+  parent.appendChild(r);
 }
 
-function addPhotoPlaceholder(parent, label, y, w, h, borderColor, x, imageKey) {
-  var group = figma.createRectangle();
-  group.name = '📷 ' + label;
-  group.resize(w || W, h || H);
-  group.x = x || 0;
-  group.y = y || 0;
-  group.fills = [solidFill(C.surface)];
-  group.cornerRadius = (w && w < W) ? 16 : 0;
-
-  // Queue image loading if an imageKey is provided
-  if (imageKey && IMAGES[imageKey]) {
-    imageQueue.push({ node: group, url: IMAGES[imageKey] });
+function addPhoto(parent, photoKey, y, w, h, x) {
+  var r = figma.createRectangle();
+  r.name = 'Photo'; r.resize(w || W, h || H);
+  r.x = x || 0; r.y = y || 0;
+  r.fills = [solidFill(C.surface)];
+  r.cornerRadius = (w && w < W) ? 16 : 0;
+  if (photoKey && PHOTOS[photoKey]) {
+    imageQueue.push({ node: r, url: PHOTOS[photoKey] });
   }
-
-  parent.appendChild(group);
-  return group;
-}
-
-function addText(parent, str, opts = {}) {
-  const {
-    x = W / 2, y = 0, size = 40, weight = 'Bold',
-    color = C.white, align = 'CENTER', width = W - 160,
-  } = opts;
-
-  const txt = figma.createText();
-  txt.characters = str;
-  txt.fontSize = size;
-  txt.fontName = { family: "Inter", style: weight };
-  // Handle colors that might have .a (opacity) from rgba()
-  var fillOpacity = color.a !== undefined ? color.a : 1;
-  txt.fills = [solidFill(color, fillOpacity)];
-  txt.textAlignHorizontal = align;
-  txt.textAutoResize = 'HEIGHT';
-  txt.resize(width, 10);
-  txt.x = align === 'CENTER' ? (W - width) / 2 : x;
-  txt.y = y;
-  if (align === 'LEFT') txt.x = x;
-
-  parent.appendChild(txt);
-  return txt;
-}
-
-function addPill(parent, str, x, y, bgColor, textColor, size) {
-  const frame = figma.createFrame();
-  frame.name = str;
-  frame.layoutMode = 'HORIZONTAL';
-  frame.primaryAxisAlignItems = 'CENTER';
-  frame.counterAxisAlignItems = 'CENTER';
-  frame.paddingLeft = 40;
-  frame.paddingRight = 40;
-  frame.paddingTop = 16;
-  frame.paddingBottom = 16;
-  frame.cornerRadius = 40;
-  frame.fills = [solidFill(bgColor)];
-  frame.x = x;
-  frame.y = y;
-
-  const txt = figma.createText();
-  txt.characters = str;
-  txt.fontSize = size || 30;
-  txt.fontName = { family: "Inter", style: "Extra Bold" };
-  txt.fills = [solidFill(textColor)];
-  frame.appendChild(txt);
-
-  parent.appendChild(frame);
-  return frame;
-}
-
-function addCard(parent, x, y, w, h, bgColor, borderColor) {
-  const rect = figma.createRectangle();
-  rect.name = 'Card';
-  rect.x = x;
-  rect.y = y;
-  rect.resize(w, h);
-  rect.cornerRadius = 24;
-  var bg = bgColor || C.surface;
-  var bgOpacity = bg.a !== undefined ? bg.a : 0.3;
-  rect.fills = [solidFill(bg, bgOpacity)];
-  if (borderColor) {
-    var bOpacity = borderColor.a !== undefined ? borderColor.a : 1;
-    rect.strokes = [solidFill(borderColor, bOpacity)];
-    rect.strokeWeight = 1;
-    rect.strokeAlign = 'INSIDE';
-  }
-  parent.appendChild(rect);
-  return rect;
-}
-
-function addCircle(parent, x, y, r, color) {
-  const e = figma.createEllipse();
-  e.x = x - r;
-  e.y = y - r;
-  e.resize(r * 2, r * 2);
-  e.fills = [solidFill(color)];
-  parent.appendChild(e);
-  return e;
+  parent.appendChild(r);
+  return r;
 }
 
 function addOverlay(parent, opacity) {
-  const rect = figma.createRectangle();
-  rect.name = 'Dark Overlay';
-  rect.resize(W, H);
-  var o = opacity || 0.7;
-  var black = { r: 0, g: 0, b: 0 };
-  rect.fills = [{
+  var r = figma.createRectangle();
+  r.name = 'Overlay'; r.resize(W, H);
+  var o = Math.min(opacity || 0.5, 1);
+  r.fills = [{
     type: 'GRADIENT_LINEAR',
     gradientStops: [
-      { position: 0, color: rgb(black, Math.min(o, 1)) },
-      { position: 0.5, color: rgb(black, Math.max(o - 0.15, 0)) },
-      { position: 1, color: rgb(black, Math.min(o + 0.1, 1)) },
+      { position: 0, color: rgb({ r: 0, g: 0, b: 0 }, Math.min(o + 0.1, 1)) },
+      { position: 0.4, color: rgb({ r: 0, g: 0, b: 0 }, Math.max(o - 0.1, 0)) },
+      { position: 1, color: rgb({ r: 0, g: 0, b: 0 }, Math.min(o + 0.15, 1)) }
     ],
-    gradientTransform: [[0, 0, 0], [0, 1, 0]],
+    gradientTransform: [[0, 0, 0], [0, 1, 0]]
   }];
-  parent.appendChild(rect);
+  parent.appendChild(r);
 }
 
-function slideLabel(parent, current, total) {
-  addText(parent, 'SLIDE ' + current + ' OF ' + total, {
-    y: H - 70, size: 20, weight: 'Semi Bold',
-    color: rgba(C.white, 0.25),
-  });
+function addText(parent, str, opts) {
+  opts = opts || {};
+  var t = figma.createText();
+  t.characters = str;
+  t.fontSize = opts.size || 40;
+  t.fontName = { family: "Inter", style: opts.weight || 'Bold' };
+  var c = opts.color || C.white;
+  var op = c.a !== undefined ? c.a : 1;
+  t.fills = [solidFill(c, op)];
+  t.textAlignHorizontal = opts.align || 'CENTER';
+  t.textAutoResize = 'HEIGHT';
+  var w = opts.width || (W - 160);
+  t.resize(w, 10);
+  t.x = opts.align === 'LEFT' ? (opts.x || 80) : ((W - w) / 2);
+  if (opts.x !== undefined && opts.align === 'LEFT') t.x = opts.x;
+  t.y = opts.y || 0;
+  if (opts.lineHeight) {
+    t.lineHeight = { value: opts.lineHeight, unit: 'PIXELS' };
+  }
+  parent.appendChild(t);
+  return t;
+}
+
+function addPill(parent, str, x, y, bg, textColor, sz) {
+  var f = figma.createFrame();
+  f.name = str; f.layoutMode = 'HORIZONTAL';
+  f.primaryAxisAlignItems = 'CENTER'; f.counterAxisAlignItems = 'CENTER';
+  f.paddingLeft = 40; f.paddingRight = 40; f.paddingTop = 18; f.paddingBottom = 18;
+  f.cornerRadius = 40; f.fills = [solidFill(bg)];
+  f.x = x; f.y = y;
+  var t = figma.createText();
+  t.characters = str; t.fontSize = sz || 30;
+  t.fontName = { family: "Inter", style: "Extra Bold" };
+  t.fills = [solidFill(textColor)];
+  f.appendChild(t);
+  parent.appendChild(f);
+}
+
+function addCard(parent, x, y, w, h, bg, border) {
+  var r = figma.createRectangle();
+  r.name = 'Card'; r.x = x; r.y = y; r.resize(w, h);
+  r.cornerRadius = 20;
+  var bgOp = bg && bg.a !== undefined ? bg.a : 0.15;
+  r.fills = [solidFill(bg || C.white, bgOp)];
+  if (border) {
+    var bOp = border.a !== undefined ? border.a : 0.3;
+    r.strokes = [solidFill(border, bOp)];
+    r.strokeWeight = 1; r.strokeAlign = 'INSIDE';
+  }
+  parent.appendChild(r);
+}
+
+function addCircle(parent, x, y, rad, color) {
+  var e = figma.createEllipse();
+  e.x = x - rad; e.y = y - rad; e.resize(rad * 2, rad * 2);
+  e.fills = [solidFill(color)];
+  parent.appendChild(e);
 }
 
 // ===================================================================
-// SLIDES
+// SLIDESHOW 1: What is SpyShot (6 slides)
 // ===================================================================
 
-function slide1_hook(frame) {
-  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.midPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Friends group selfie outdoor with beers', 0, W, H, C.primary, null, 's1_hook');
-  addOverlay(frame, 0.45);
-  addText(frame, 'YOUR PARTIES ARE ABOUT TO CHANGE', { y: 680, size: 30, weight: 'Semi Bold', color: C.primary });
-  addText(frame, 'The app that turns any night out into a legendary story', { y: 760, size: 72, weight: 'Black' });
-  addText(frame, 'SWIPE →', { y: H - 110, size: 26, color: rgba(C.white, 0.4) });
-  slideLabel(frame, 1, 6);
+function s1_hook(f) {
+  addGradient(f, [[0, C.deepPurple], [0.5, C.midPink], [1, C.deepOrange]]);
+  addPhoto(f, 'cheers1');
+  addOverlay(f, 0.5);
+  // Minimal text, lots of breathing room
+  addText(f, 'YOUR PARTIES ARE\nABOUT TO CHANGE', { y: 700, size: 28, weight: 'Semi Bold', color: C.primary, lineHeight: 42 });
+  addText(f, 'The app that turns\nany night out into\na legendary story', { y: 820, size: 68, weight: 'Black', lineHeight: 82 });
+  addText(f, 'swipe', { y: H - 120, size: 20, weight: 'Medium', color: rgba(C.white, 0.35) });
 }
 
-function slide1_problem(frame) {
-  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepBlue]]);
-  addPhotoPlaceholder(frame, 'People bored on phones at party/gathering', 0, W, H, C.error, null, 's1_problem');
-  addOverlay(frame, 0.55);
-  addText(frame, "We've all been there...", { y: 180, size: 58, weight: 'Extra Bold' });
-  const problems = [
-    "Everyone's on their phone at the party",
-    'Same boring conversations every weekend',
-    'No one wants to suggest a drinking game',
+function s1_problem(f) {
+  addGradient(f, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepBlue]]);
+  addPhoto(f, 'party2');
+  addOverlay(f, 0.6);
+  addText(f, "We've all\nbeen there", { y: 260, size: 62, weight: 'Black', lineHeight: 74 });
+  var items = [
+    "Everyone's on their phone",
+    'Same conversations every weekend',
     'The night has zero memorable moments',
     'Nothing to look back on the next day',
   ];
-  let py = 340;
-  problems.forEach(p => {
-    addText(frame, '✕', { x: 100, y: py, size: 36, weight: 'Extra Bold', color: C.error, align: 'LEFT', width: 50 });
-    addText(frame, p, { x: 170, y: py, size: 32, weight: 'Regular', color: C.textSec, align: 'LEFT', width: 780 });
+  var py = 520;
+  for (var i = 0; i < items.length; i++) {
+    addText(f, items[i], { x: 120, y: py, size: 28, weight: 'Regular', color: rgba(C.white, 0.75), align: 'LEFT', width: 840 });
+    // Divider line
+    var line = figma.createRectangle();
+    line.resize(840, 1); line.x = 120; line.y = py + 50;
+    line.fills = [solidFill(C.white, 0.08)];
+    f.appendChild(line);
     py += 80;
-  });
-  slideLabel(frame, 2, 6);
+  }
 }
 
-function slide1_solution(frame) {
-  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPurple], [1, C.deepGreen]]);
-  addPhotoPlaceholder(frame, 'Group of friends having fun at outdoor party', 0, W, H, C.green, null, 's1_solution');
-  addOverlay(frame, 0.5);
-  addText(frame, 'SpyShot', { y: 240, size: 88, weight: 'Black', color: C.primary });
-  addText(frame, 'The party game that plays itself', { y: 360, size: 36, weight: 'Semi Bold' });
-  const features = [
-    ['🎯', 'Random Challenges', '120+ tasks from chill to extreme'],
-    ['📸', 'Photo Proof', 'Capture every legendary moment'],
-    ['🏆', 'Badges & Tiers', 'Bronze to Mythic — flex your rank'],
-    ['🔥', 'Bold Mode', 'Risk it for 2x points'],
-    ['👥', 'Social Feed', 'Relive the night with friends'],
+function s1_solution(f) {
+  addGradient(f, [[0, C.midPurple], [0.5, C.deepPurple], [1, C.deepGreen]]);
+  addPhoto(f, 'cheers2');
+  addOverlay(f, 0.55);
+  addText(f, 'SpyShot', { y: 300, size: 80, weight: 'Black', color: C.primary });
+  addText(f, 'The party game\nthat plays itself', { y: 420, size: 34, weight: 'Semi Bold', lineHeight: 48 });
+  var features = [
+    ['Random Challenges', '120+ tasks, 3 intensity levels'],
+    ['Photo Proof', 'Capture every legendary moment'],
+    ['Badges & Tiers', 'Bronze to Mythic — flex your rank'],
+    ['Bold Mode', 'Risk it for double points'],
+    ['Social Feed', 'Relive the night with friends'],
   ];
-  let fy = 500;
-  features.forEach(([icon, title, desc]) => {
-    addCard(frame, 80, fy, W - 160, 95, rgba(C.white, 0.04), rgba(C.white, 0.08));
-    addText(frame, icon, { x: 110, y: fy + 28, size: 36, align: 'LEFT', width: 50 });
-    addText(frame, title, { x: 180, y: fy + 20, size: 28, weight: 'Bold', align: 'LEFT', width: 600 });
-    addText(frame, desc, { x: 180, y: fy + 56, size: 20, weight: 'Regular', color: C.textMuted, align: 'LEFT', width: 600 });
-    fy += 115;
-  });
-  slideLabel(frame, 3, 6);
+  var fy = 620;
+  for (var i = 0; i < features.length; i++) {
+    addCard(f, 80, fy, W - 160, 85, rgba(C.white, 0.06), rgba(C.white, 0.1));
+    addText(f, features[i][0], { x: 110, y: fy + 16, size: 26, weight: 'Bold', align: 'LEFT', width: 600 });
+    addText(f, features[i][1], { x: 110, y: fy + 50, size: 18, weight: 'Regular', color: rgba(C.white, 0.55), align: 'LEFT', width: 600 });
+    fy += 105;
+  }
 }
 
-function slide1_howItWorks(frame) {
-  addGradientBg(frame, [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.midPurple]]);
-  addPhotoPlaceholder(frame, 'Friends at outdoor dinner/gathering', 0, W, H, C.blue, null, 's1_how');
-  addOverlay(frame, 0.5);
-  addText(frame, 'How SpyShot works', { y: 140, size: 52, weight: 'Extra Bold' });
-  const steps = [
-    ['Create a group', 'Invite friends or share a 4-digit room code'],
-    ['Pick your vibe', 'Chill, Wild, or Extreme — you set the intensity'],
-    ['The app picks who & what', 'Random player + challenge. Easy or Bold — your choice'],
-    ['Complete & prove it', 'Snap a photo, beat the timer, earn badges'],
-    ['Relive the night', 'Feed, reactions, leaderboard — see it all the next day'],
+function s1_how(f) {
+  addGradient(f, [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.midPurple]]);
+  addPhoto(f, 'friends1');
+  addOverlay(f, 0.55);
+  addText(f, 'How it works', { y: 200, size: 52, weight: 'Black' });
+  var steps = [
+    ['01', 'Create a group', 'Invite friends or share a 4-digit code'],
+    ['02', 'Pick your vibe', 'Chill, Wild, or Extreme'],
+    ['03', 'The app picks who & what', 'Random player + challenge'],
+    ['04', 'Complete & prove it', 'Photo, timer, or just do it'],
+    ['05', 'Relive the night', 'Feed, reactions, leaderboard'],
   ];
-  let sy = 300;
-  steps.forEach(([title, desc], i) => {
-    addCircle(frame, 140, sy + 28, 34, C.primary);
-    addText(frame, String(i + 1), { x: 120, y: sy + 10, size: 30, weight: 'Black', color: C.dark, align: 'CENTER', width: 40 });
-    addText(frame, title, { x: 200, y: sy, size: 32, weight: 'Bold', align: 'LEFT', width: 700 });
-    addText(frame, desc, { x: 200, y: sy + 40, size: 22, weight: 'Regular', color: C.textMuted, align: 'LEFT', width: 700 });
-    sy += 115;
-  });
-  slideLabel(frame, 4, 6);
+  var sy = 380;
+  for (var i = 0; i < steps.length; i++) {
+    addText(f, steps[i][0], { x: 100, y: sy, size: 32, weight: 'Black', color: C.primary, align: 'LEFT', width: 60 });
+    addText(f, steps[i][1], { x: 180, y: sy, size: 28, weight: 'Bold', align: 'LEFT', width: 700 });
+    addText(f, steps[i][2], { x: 180, y: sy + 38, size: 20, weight: 'Regular', color: rgba(C.white, 0.5), align: 'LEFT', width: 700 });
+    sy += 105;
+  }
 }
 
-function slide1_socialProof(frame) {
-  addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, 'Friends laughing at outdoor party/BBQ', 0, W, H, C.green, null, 's1_proof');
-  addOverlay(frame, 0.4);
-  addText(frame, '"', { y: 380, size: 140, weight: 'Black', color: C.primary });
-  addText(frame, "We used SpyShot at our house party and it was genuinely the most fun we've had in months. Everyone was crying laughing.", { y: 560, size: 40, weight: 'Semi Bold' });
-  addText(frame, '— @emma_w', { y: 900, size: 28, weight: 'Bold', color: C.primary });
-  addText(frame, 'Gold tier badge holder', { y: 940, size: 22, color: rgba(C.white, 0.4) });
-  const stats = [['120+', 'Challenges'], ['3', 'Intensities'], ['9', 'Badge Tiers']];
-  stats.forEach(([num, label], i) => {
-    const sx = 200 + i * 280;
-    addText(frame, num, { x: sx - 60, y: 1100, size: 50, weight: 'Black', color: C.primary, align: 'CENTER', width: 120 });
-    addText(frame, label, { x: sx - 80, y: 1165, size: 20, weight: 'Medium', color: rgba(C.white, 0.5), align: 'CENTER', width: 160 });
-  });
-  slideLabel(frame, 5, 6);
+function s1_proof(f) {
+  addGradient(f, [[0, C.deepGreen], [0.5, C.deepPurple], [1, C.deepPink]]);
+  addPhoto(f, 'friends2');
+  addOverlay(f, 0.45);
+  addText(f, '"We used SpyShot at our\nhouse party and it was\ngenuinely the most fun\nwe\'ve had in months."', { y: 480, size: 44, weight: 'Semi Bold', lineHeight: 60 });
+  addText(f, '@emma_w', { y: 800, size: 24, weight: 'Bold', color: C.primary });
+  // Stats at bottom with space
+  addText(f, '120+', { x: 120, y: 1080, size: 48, weight: 'Black', color: C.primary, align: 'LEFT', width: 200 });
+  addText(f, 'challenges', { x: 120, y: 1135, size: 18, weight: 'Medium', color: rgba(C.white, 0.45), align: 'LEFT', width: 200 });
+  addText(f, '3', { x: 440, y: 1080, size: 48, weight: 'Black', color: C.primary, align: 'LEFT', width: 200 });
+  addText(f, 'intensity levels', { x: 440, y: 1135, size: 18, weight: 'Medium', color: rgba(C.white, 0.45), align: 'LEFT', width: 200 });
+  addText(f, '9', { x: 740, y: 1080, size: 48, weight: 'Black', color: C.primary, align: 'LEFT', width: 200 });
+  addText(f, 'badge tiers', { x: 740, y: 1135, size: 18, weight: 'Medium', color: rgba(C.white, 0.45), align: 'LEFT', width: 200 });
 }
 
-function slide1_cta(frame) {
-  addGradientBg(frame, [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beer cheers outdoor close-up', 0, W, H, C.primary, null, 's1_cta');
-  addOverlay(frame, 0.4);
-  addText(frame, 'SpyShot', { y: 600, size: 100, weight: 'Black', color: C.primary });
-  addText(frame, 'Your next night out deserves to be legendary', { y: 750, size: 48, weight: 'Extra Bold' });
-  addPill(frame, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 34);
-  addText(frame, 'Available on iOS & Android', { y: 1080, size: 24, color: rgba(C.white, 0.4) });
-  slideLabel(frame, 6, 6);
+function s1_cta(f) {
+  addGradient(f, [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]);
+  addPhoto(f, 'toast1');
+  addOverlay(f, 0.45);
+  addText(f, 'SpyShot', { y: 620, size: 96, weight: 'Black', color: C.primary });
+  addText(f, 'Your next night out\ndeserves to be legendary', { y: 770, size: 40, weight: 'Semi Bold', lineHeight: 54 });
+  addPill(f, 'Download Free', (W - 340) / 2, 960, C.primary, C.dark, 32);
+  addText(f, 'iOS & Android', { y: 1060, size: 18, weight: 'Medium', color: rgba(C.white, 0.3) });
 }
 
-// SLIDESHOW 2
-function slide2_hook(frame) {
-  addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, 'Friends cheersing beers at outdoor gathering', 0, W, H, C.orange, null, 's2_hook');
-  addOverlay(frame, 0.4);
-  addText(frame, '🔥', { y: 620, size: 100 });
-  addText(frame, 'Every task has two versions', { y: 760, size: 66, weight: 'Black' });
-  addText(frame, 'Do you play it safe... or go BOLD?', { y: 1020, size: 30, color: rgba(C.white, 0.55) });
-  slideLabel(frame, 1, 5);
+// ===================================================================
+// SLIDESHOW 2: Bold or Easy (5 slides)
+// ===================================================================
+
+function s2_hook(f) {
+  addGradient(f, [[0, C.deepOrange], [0.5, C.deepPurple], [1, C.deepPink]]);
+  addPhoto(f, 'cheers3');
+  addOverlay(f, 0.45);
+  addText(f, 'Every task has\ntwo versions', { y: 700, size: 64, weight: 'Black', lineHeight: 78 });
+  addText(f, 'Play it safe, or go bold.', { y: 920, size: 28, weight: 'Regular', color: rgba(C.white, 0.55) });
 }
 
-function slide2_easy(frame) {
-  addGradientBg(frame, [[0, C.deepGreen], [0.5, C.deepBlue], [1, C.deepPurple]]);
-  addPhotoPlaceholder(frame, 'Relaxed outdoor hangout with friends', 0, W, H, C.green, null, 's2_easy');
-  addOverlay(frame, 0.5);
-  addText(frame, '✅ EASY MODE', { y: 280, size: 28, weight: 'Bold', color: C.green });
-  addCard(frame, 80, 380, W - 160, 280, rgba(C.green, 0.06), rgba(C.green, 0.2));
-  addText(frame, 'Stranger Selfie', { x: 130, y: 420, size: 44, weight: 'Extra Bold', align: 'LEFT', width: 780 });
-  addText(frame, "Take a selfie with someone you don't know", { x: 130, y: 485, size: 30, weight: 'Regular', color: C.textSec, align: 'LEFT', width: 780 });
-  addText(frame, '+1 point  ·  Standard badge progress', { x: 130, y: 570, size: 24, weight: 'Bold', color: C.green, align: 'LEFT', width: 780 });
-  addPhotoPlaceholder(frame, 'Photo 1', 760, 260, 220, C.green, 100);
-  addPhotoPlaceholder(frame, 'Photo 2', 760, 260, 220, C.green, 390);
-  addPhotoPlaceholder(frame, 'Photo 3', 760, 260, 220, C.green, 680);
-  addPill(frame, '🛡️ Safe & Fun', (W - 260) / 2, 1050, C.green, C.white, 28);
-  slideLabel(frame, 2, 5);
+function s2_easy(f) {
+  addGradient(f, [[0, C.deepGreen], [0.5, C.deepBlue], [1, C.deepPurple]]);
+  addPhoto(f, 'outdoor1');
+  addOverlay(f, 0.6);
+  addText(f, 'EASY', { y: 300, size: 24, weight: 'Bold', color: C.green });
+  addCard(f, 80, 400, W - 160, 250, rgba(C.green, 0.08), rgba(C.green, 0.2));
+  addText(f, 'Stranger Selfie', { x: 120, y: 440, size: 40, weight: 'Extra Bold', align: 'LEFT', width: 800 });
+  addText(f, 'Take a selfie with\nsomeone you don\'t know', { x: 120, y: 500, size: 26, weight: 'Regular', color: rgba(C.white, 0.7), align: 'LEFT', width: 800, lineHeight: 36 });
+  addText(f, '+1 point', { x: 120, y: 590, size: 22, weight: 'Bold', color: C.green, align: 'LEFT', width: 400 });
+  addPill(f, 'Safe & Fun', (W - 240) / 2, 780, C.green, C.white, 26);
 }
 
-function slide2_bold(frame) {
-  addGradientBg(frame, [[0, C.deepOrange], [0.5, C.deepPink], [1, C.deepPurple]]);
-  addPhotoPlaceholder(frame, 'Energetic outdoor party group', 0, W, H, C.orange, null, 's2_bold');
-  addOverlay(frame, 0.45);
-  addText(frame, '🔥🔥🔥', { y: 280, size: 70 });
-  addText(frame, 'BOLD MODE', { y: 400, size: 28, weight: 'Bold', color: C.orange });
-  addCard(frame, 80, 490, W - 160, 280, rgba(C.orange, 0.06), rgba(C.orange, 0.2));
-  addText(frame, 'Stranger Selfie', { x: 130, y: 530, size: 44, weight: 'Extra Bold', align: 'LEFT', width: 780 });
-  addText(frame, 'Take a selfie with THREE people you don\'t know', { x: 130, y: 595, size: 30, weight: 'Regular', color: C.textSec, align: 'LEFT', width: 780 });
-  addText(frame, '+2 points  ·  2x badge progress', { x: 130, y: 680, size: 24, weight: 'Bold', color: C.orange, align: 'LEFT', width: 780 });
-  addPill(frame, '⚡ 2X POINTS', (W - 280) / 2, 860, C.orange, C.white, 32);
-  slideLabel(frame, 3, 5);
+function s2_bold(f) {
+  addGradient(f, [[0, C.deepOrange], [0.5, C.deepPink], [1, C.deepPurple]]);
+  addPhoto(f, 'party1');
+  addOverlay(f, 0.5);
+  addText(f, 'BOLD', { y: 300, size: 24, weight: 'Bold', color: C.orange });
+  addCard(f, 80, 400, W - 160, 250, rgba(C.orange, 0.08), rgba(C.orange, 0.2));
+  addText(f, 'Stranger Selfie', { x: 120, y: 440, size: 40, weight: 'Extra Bold', align: 'LEFT', width: 800 });
+  addText(f, 'Take a selfie with THREE\npeople you don\'t know', { x: 120, y: 500, size: 26, weight: 'Regular', color: rgba(C.white, 0.7), align: 'LEFT', width: 800, lineHeight: 36 });
+  addText(f, '+2 points  ·  2x progress', { x: 120, y: 590, size: 22, weight: 'Bold', color: C.orange, align: 'LEFT', width: 400 });
+  addPill(f, '2X POINTS', (W - 260) / 2, 780, C.orange, C.white, 28);
 }
 
-function slide2_vs(frame) {
-  // Left half - Easy
-  const leftBg = figma.createRectangle();
-  leftBg.resize(W / 2, H);
-  leftBg.fills = [solidFill(C.green)];
-  frame.appendChild(leftBg);
-  addPhotoPlaceholder(frame, 'Chill hangout photo', 0, W / 2, H, C.green, 0, 's2_vs_left');
-  const leftOv = figma.createRectangle();
-  leftOv.resize(W / 2, H);
-  leftOv.fills = [solidFill(C.green, 0.7)];
-  frame.appendChild(leftOv);
-  addText(frame, 'Easy', { x: 0, y: 800, size: 56, weight: 'Black', align: 'CENTER', width: W / 2 });
-  addText(frame, 'Chill vibes\nStandard points\nNo pressure', { x: 0, y: 890, size: 28, align: 'CENTER', width: W / 2 });
+function s2_vs(f) {
+  // Left: Easy (green)
+  var left = figma.createRectangle();
+  left.resize(W / 2, H); left.fills = [solidFill(C.green)];
+  f.appendChild(left);
+  addPhoto(f, 'celebrate1', 0, W / 2, H, 0);
+  var leftOv = figma.createRectangle();
+  leftOv.resize(W / 2, H); leftOv.fills = [solidFill(C.green, 0.65)];
+  f.appendChild(leftOv);
+  addText(f, 'Easy', { x: 0, y: 800, size: 52, weight: 'Black', align: 'CENTER', width: W / 2 });
+  addText(f, 'Chill vibes\nStandard points', { x: 0, y: 880, size: 24, weight: 'Regular', align: 'CENTER', width: W / 2, lineHeight: 36 });
 
-  // Right half - Bold
-  const rightBg = figma.createRectangle();
-  rightBg.x = W / 2;
-  rightBg.resize(W / 2, H);
-  rightBg.fills = [solidFill(C.orange)];
-  frame.appendChild(rightBg);
-  addPhotoPlaceholder(frame, 'Wild party photo', 0, W / 2, H, C.orange, W / 2, 's2_vs_right');
-  const rightOv = figma.createRectangle();
-  rightOv.x = W / 2;
-  rightOv.resize(W / 2, H);
-  rightOv.fills = [solidFill(C.orange, 0.7)];
-  frame.appendChild(rightOv);
-  addText(frame, 'Bold', { x: W / 2, y: 800, size: 56, weight: 'Black', align: 'CENTER', width: W / 2 });
-  addText(frame, 'Maximum chaos\nDouble points\nLegend status', { x: W / 2, y: 890, size: 28, align: 'CENTER', width: W / 2 });
+  // Right: Bold (orange)
+  var right = figma.createRectangle();
+  right.x = W / 2; right.resize(W / 2, H); right.fills = [solidFill(C.orange)];
+  f.appendChild(right);
+  addPhoto(f, 'celebrate2', 0, W / 2, H, W / 2);
+  var rightOv = figma.createRectangle();
+  rightOv.x = W / 2; rightOv.resize(W / 2, H); rightOv.fills = [solidFill(C.orange, 0.65)];
+  f.appendChild(rightOv);
+  addText(f, 'Bold', { x: W / 2, y: 800, size: 52, weight: 'Black', align: 'CENTER', width: W / 2 });
+  addText(f, 'Double points\nLegend status', { x: W / 2, y: 880, size: 24, weight: 'Regular', align: 'CENTER', width: W / 2, lineHeight: 36 });
 
   // VS badge
-  addCircle(frame, W / 2, H / 2, 50, C.primary);
-  addText(frame, 'VS', { x: W / 2 - 40, y: H / 2 - 20, size: 34, weight: 'Black', color: C.dark, align: 'CENTER', width: 80 });
-  slideLabel(frame, 4, 5);
+  addCircle(f, W / 2, H / 2, 46, C.primary);
+  addText(f, 'VS', { x: W / 2 - 35, y: H / 2 - 18, size: 30, weight: 'Black', color: C.dark, align: 'CENTER', width: 70 });
 }
 
-function slide2_cta(frame) {
-  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beer cheers outdoor', 0, W, H, C.primary, null, 's2_cta');
-  addOverlay(frame, 0.4);
-  addText(frame, 'SpyShot', { y: 680, size: 90, weight: 'Black', color: C.primary });
-  addText(frame, 'How bold are you willing to go?', { y: 810, size: 50, weight: 'Extra Bold' });
-  addPill(frame, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 34);
-  slideLabel(frame, 5, 5);
+function s2_cta(f) {
+  addGradient(f, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
+  addPhoto(f, 'cheers4');
+  addOverlay(f, 0.45);
+  addText(f, 'SpyShot', { y: 680, size: 86, weight: 'Black', color: C.primary });
+  addText(f, 'How bold are you\nwilling to go?', { y: 810, size: 42, weight: 'Semi Bold', lineHeight: 56 });
+  addPill(f, 'Download Free', (W - 340) / 2, 980, C.primary, C.dark, 32);
 }
 
-// SLIDESHOW 3
-function slide3_hook(frame) {
-  addGradientBg(frame, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Group outdoor with drinks/beers', 0, W, H, C.primary, null, 's3_hook');
-  addOverlay(frame, 0.4);
-  addText(frame, '😎  🔥  💀', { y: 640, size: 70 });
-  addText(frame, 'Not every night is the same vibe', { y: 780, size: 62, weight: 'Black' });
-  addText(frame, "That's why SpyShot has 3 intensity modes", { y: 1020, size: 28, color: rgba(C.white, 0.45) });
-  slideLabel(frame, 1, 5);
+// ===================================================================
+// SLIDESHOW 3: Pick Your Vibe (5 slides)
+// ===================================================================
+
+function s3_hook(f) {
+  addGradient(f, [[0, C.deepPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
+  addPhoto(f, 'group1');
+  addOverlay(f, 0.45);
+  addText(f, 'Not every night\nis the same vibe', { y: 700, size: 62, weight: 'Black', lineHeight: 76 });
+  addText(f, 'Three intensity modes.\nYou choose.', { y: 920, size: 28, weight: 'Regular', color: rgba(C.white, 0.55), lineHeight: 40 });
 }
 
-function modeSlide(frame, emoji, name, desc, nameColor, descColor, borderColor, tasks, slideNum, bgPhoto, imageKey) {
-  // Each mode gets a distinct vibrant gradient
-  var gradients = {
+function s3_mode(f, name, desc, nameColor, tasks, photoKey) {
+  var grads = {
     'CHILL': [[0, C.deepBlue], [0.5, C.deepPurple], [1, C.deepGreen]],
     'WILD': [[0, C.deepOrange], [0.5, C.midPink], [1, C.deepPurple]],
     'EXTREME': [[0, C.deepPink], [0.5, C.midPurple], [1, C.deepOrange]]
   };
-  addGradientBg(frame, gradients[name] || [[0, C.deepPurple], [1, C.deepPink]]);
-  addPhotoPlaceholder(frame, bgPhoto, 0, W, H, borderColor, null, imageKey);
-  addOverlay(frame, 0.5);
-  addText(frame, emoji, { y: 200, size: 90 });
-  addText(frame, name, { y: 320, size: 66, weight: 'Black', color: nameColor });
-  addText(frame, desc, { y: 410, size: 30, color: descColor });
-  let ty = 510;
-  tasks.forEach(t => {
-    addCard(frame, 80, ty, W - 160, 65, rgba(borderColor, 0.05), rgba(borderColor, 0.15));
-    addText(frame, t, { x: 110, y: ty + 16, size: 24, weight: 'Regular', align: 'LEFT', width: 820 });
-    ty += 82;
-  });
-  slideLabel(frame, slideNum, 5);
+  addGradient(f, grads[name] || [[0, C.deepPurple], [1, C.deepPink]]);
+  addPhoto(f, photoKey);
+  addOverlay(f, 0.55);
+  addText(f, name, { y: 260, size: 64, weight: 'Black', color: nameColor });
+  addText(f, desc, { y: 345, size: 26, weight: 'Regular', color: rgba(C.white, 0.55) });
+  var ty = 480;
+  for (var i = 0; i < tasks.length; i++) {
+    addCard(f, 80, ty, W - 160, 60, rgba(nameColor, 0.06), rgba(nameColor, 0.15));
+    addText(f, tasks[i], { x: 110, y: ty + 16, size: 22, weight: 'Regular', align: 'LEFT', width: 820 });
+    ty += 80;
+  }
   return ty;
 }
 
-function slide3_chill(frame) {
-  const ty = modeSlide(frame, '😎', 'CHILL', 'Icebreakers & light fun', C.blue, { r: 0.576, g: 0.773, b: 0.988 }, C.blue, [
-    '🎤  Sing the first line of your last song',
-    '📱  Show your 7th camera roll photo',
-    '🤝  Compliment everyone at the table',
-    '🎭  Celebrity impression contest',
-    '💬  Two truths and one lie',
-  ], 2, 'Relaxed hangout with friends and beers', 's3_chill');
-  addPhotoPlaceholder(frame, 'Chill photo 1', ty + 20, 260, 180, C.blue, 100);
-  addPhotoPlaceholder(frame, 'Chill photo 2', ty + 20, 260, 180, C.blue, 390);
-  addPhotoPlaceholder(frame, 'Chill photo 3', ty + 20, 260, 180, C.blue, 680);
+function s3_chill(f) {
+  s3_mode(f, 'CHILL', 'Icebreakers & light fun', C.blue, [
+    'Sing the first line of your last song',
+    'Show your 7th camera roll photo',
+    'Compliment everyone at the table',
+    'Celebrity impression — group votes',
+    'Two truths and one lie',
+  ], 'group2');
 }
 
-function slide3_wild(frame) {
-  modeSlide(frame, '🔥', 'WILD', 'Classic party mode', C.orange, { r: 0.992, g: 0.729, b: 0.455 }, C.orange, [
-    '💃  Challenge someone to a dance-off',
-    '💍  Fake propose to a stranger',
-    '🎸  30-second air guitar solo',
-    '📸  Photobomb as many photos as possible',
-    '🎵  Request a song — if it plays, everyone drinks',
-  ], 3, 'Festival or outdoor party energy', 's3_wild');
+function s3_wild(f) {
+  s3_mode(f, 'WILD', 'Classic party mode', C.orange, [
+    'Challenge someone to a dance-off',
+    'Fake propose to a stranger',
+    '30-second air guitar solo',
+    'Photobomb as many photos as possible in 60s',
+    'Request a song — if it plays, everyone drinks',
+  ], 'rooftop1');
 }
 
-function slide3_extreme(frame) {
-  const ty = modeSlide(frame, '💀', 'EXTREME', 'Late night chaos', C.pink, { r: 0.976, g: 0.659, b: 0.831 }, C.pink, [
-    '🎤  Sing a duet with a complete stranger',
-    '🏄  Get 3 people to crowd surf you',
-    '🍋  Eat a lemon without making a face',
-    '🎙️  Give a speech standing on a chair',
-    '🔥  Full roast battle — group votes winner',
-  ], 4, 'Intense crowd energy outdoor', 's3_extreme');
-  addText(frame, '* Not for the faint of heart', { y: ty + 20, size: 24, weight: 'Semi Bold', color: C.pink });
+function s3_extreme(f) {
+  s3_mode(f, 'EXTREME', 'Late night chaos', C.pink, [
+    'Sing a duet with a complete stranger',
+    'Get 3 people to crowd surf you',
+    'Eat a lemon without making a face',
+    'Give a speech standing on a chair',
+    'Full roast battle — group votes the winner',
+  ], 'cans1');
+  addText(f, 'Not for the faint of heart.', { y: 920, size: 20, weight: 'Medium', color: rgba(C.pink, 0.7) });
 }
 
-function slide3_cta(frame) {
-  addGradientBg(frame, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
-  addPhotoPlaceholder(frame, 'Beers outdoor close-up', 0, W, H, C.primary, null, 's3_cta');
-  addOverlay(frame, 0.4);
-  addText(frame, 'SpyShot', { y: 620, size: 80, weight: 'Black', color: C.primary });
-  addText(frame, 'Pick your vibe. Start the game.', { y: 750, size: 48, weight: 'Extra Bold' });
-  addPill(frame, 'Chill', W / 2 - 300, 900, rgba(C.blue, 0.2), C.blue, 26);
-  addPill(frame, 'Wild', W / 2 - 60, 900, rgba(C.orange, 0.2), C.orange, 26);
-  addPill(frame, 'Extreme', W / 2 + 160, 900, rgba(C.pink, 0.2), C.pink, 26);
-  addPill(frame, 'Download Free', (W - 340) / 2, 1020, C.primary, C.dark, 34);
-  slideLabel(frame, 5, 5);
+function s3_cta(f) {
+  addGradient(f, [[0, C.midPurple], [0.5, C.deepPink], [1, C.deepOrange]]);
+  addPhoto(f, 'toast2');
+  addOverlay(f, 0.45);
+  addText(f, 'SpyShot', { y: 620, size: 76, weight: 'Black', color: C.primary });
+  addText(f, 'Pick your vibe.\nStart the game.', { y: 740, size: 40, weight: 'Semi Bold', lineHeight: 54 });
+  // Mode pills
+  addPill(f, 'Chill', W / 2 - 280, 900, rgba(C.blue, 0.25), C.blue, 24);
+  addPill(f, 'Wild', W / 2 - 55, 900, rgba(C.orange, 0.25), C.orange, 24);
+  addPill(f, 'Extreme', W / 2 + 150, 900, rgba(C.pink, 0.25), C.pink, 24);
+  addPill(f, 'Download Free', (W - 340) / 2, 1020, C.primary, C.dark, 32);
 }
 
 // ===================================================================
@@ -542,54 +452,47 @@ function slide3_cta(frame) {
 
 async function main() {
   await loadFont();
+  var page = figma.currentPage;
+  var GAP = 120;
+  var xOffset = 0;
 
-  const page = figma.currentPage;
-  const GAP = 120;
-  let xOffset = 0;
-
-  // Section labels
-  const sections = [
-    { title: 'Slideshow 1: What is SpyShot', slides: [slide1_hook, slide1_problem, slide1_solution, slide1_howItWorks, slide1_socialProof, slide1_cta] },
-    { title: 'Slideshow 2: Bold or Easy', slides: [slide2_hook, slide2_easy, slide2_bold, slide2_vs, slide2_cta] },
-    { title: 'Slideshow 3: Pick Your Vibe', slides: [slide3_hook, slide3_chill, slide3_wild, slide3_extreme, slide3_cta] },
+  var sections = [
+    { title: 'Slideshow 1: What is SpyShot', slides: [s1_hook, s1_problem, s1_solution, s1_how, s1_proof, s1_cta] },
+    { title: 'Slideshow 2: Bold or Easy', slides: [s2_hook, s2_easy, s2_bold, s2_vs, s2_cta] },
+    { title: 'Slideshow 3: Pick Your Vibe', slides: [s3_hook, s3_chill, s3_wild, s3_extreme, s3_cta] },
   ];
 
-  for (const section of sections) {
-    // Section title
-    const label = figma.createText();
+  for (var s = 0; s < sections.length; s++) {
+    var section = sections[s];
+    var label = figma.createText();
     label.characters = section.title;
     label.fontSize = 48;
     label.fontName = { family: "Inter", style: "Bold" };
     label.fills = [solidFill(C.primary)];
-    label.x = xOffset;
-    label.y = -80;
+    label.x = xOffset; label.y = -80;
     page.appendChild(label);
 
-    for (let i = 0; i < section.slides.length; i++) {
-      var frame = createSlideFrame(section.title + ' — Slide ' + (i + 1), xOffset, 0);
+    for (var i = 0; i < section.slides.length; i++) {
+      var frame = makeFrame(section.title + ' - Slide ' + (i + 1), xOffset, 0);
       page.appendChild(frame);
       section.slides[i](frame);
       xOffset += W + GAP;
     }
-    xOffset += GAP * 2; // Extra gap between sections
+    xOffset += GAP * 2;
   }
 
-  // Load all queued images
-  figma.notify('Loading ' + imageQueue.length + ' images from Unsplash...');
+  // Load images
+  figma.notify('Loading ' + imageQueue.length + ' photos...');
   var loaded = 0;
-  var failed = 0;
   for (var q = 0; q < imageQueue.length; q++) {
     try {
       await setImageFill(imageQueue[q].node, imageQueue[q].url);
       loaded++;
-    } catch (e) {
-      failed++;
-    }
+    } catch (e) {}
   }
 
-  // Zoom to fit
   figma.viewport.scrollAndZoomIntoView(page.children);
-  figma.notify('✅ 16 slides created! ' + loaded + ' images loaded' + (failed > 0 ? ', ' + failed + ' failed' : ''));
+  figma.notify('Done! ' + loaded + ' photos loaded across 16 slides.');
   figma.closePlugin();
 }
 
